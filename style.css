@@ -52,12 +52,7 @@ body {
   justify-content: space-between;
   gap: 20px;
 }
-.render-container__title {
-  font-size: 18px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: center;
-}
+
 .render-container__section {
   width: 100%;
   text-align: left;
