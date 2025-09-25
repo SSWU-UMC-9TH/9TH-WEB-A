@@ -1,89 +1,32 @@
-import { useState, type FormEvent } from "react";
-import type { TTodo } from "../types/todo";
+import TodoList from "./TodoList";
+import TodoForm from "./TodoForm";
+import { useTodo } from "../context/TodoContext";
 
 const Todo = () => {
-  const [todos, setTodos] = useState<TTodo[]>([]);
-  const [doneTodos, setDoneTodos] = useState<TTodo[]>([]);
-  const [input, setInput] = useState<string>('');
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const text = input.trim(); // 공백 제거
-
-    if (text) {
-      const newTodo: TTodo = {
-        id: Date.now(),
-        text,
-      };
-      setTodos((prevTodos) => [...prevTodos, newTodo]); // 기존 값은 유지, newTodo 추가
-      setInput('');
-    }
-  }
-
-  const completeTodo = (todo: TTodo) => {
-    setTodos((prevTodos) => prevTodos.filter((t) => t.id !== todo.id));
-    setDoneTodos((prevDoneTodos) => [...prevDoneTodos, todo]);
-  }
-
-  const deleteTodo = (todo: TTodo) => {
-    setDoneTodos((prevDoneTodos) => prevDoneTodos.filter((t) => t.id !== todo.id));
-  } 
+  const { todos, completeTodo, deleteTodo, doneTodos } = useTodo();
 
   return (
-    <div className='todo-container'>
-      <h1 className='todo-container__header'>모카의 Todo 리스트</h1>
-      <form onSubmit={handleSubmit} className='todo-container__form'>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className='todo-container__input'
-          placeholder='할 일을 입력해주세요.'
-          required
-        />
-        <button type='submit' className='todo-container__button'>추가</button>
-      </form>
+    <div className="todo-container">
+      <h1 className="todo-container__header">모카의 투두리스트</h1>
+      <TodoForm />
       <div className='render-container'>
-        <div className='render-container__section'>
-          <h2 className='render-container__title'>할 일</h2>
-          <ul id='todo-list' className='render-container__list'>
-            {todos.map((todo) => (
-              <li className="render-container__item">
-                <span className="render-container__item-text">{todo.text}</span>
-                <button 
-                  onClick={() => completeTodo(todo)}
-                  style={{
-                    backgroundColor: '#28a745',
-                  }}
-                className='render-container__item-button'
-              >
-                완료
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className='render-container__section'>
-          <h2 className='render-container__title'>완료</h2>
-          <ul id='completed-list' className='render-container__list'>
-            {doneTodos.map((todo) => (
-              <li className="render-container__item">
-                <span className="render-container__item-text">{todo.text}</span>
-                <button
-                  onClick={() => deleteTodo(todo)}
-                  style={{
-                    backgroundColor: '#dc3545',
-                  }}
-                className='render-container__item-button'
-              >
-                삭제
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <TodoList
+          title='할 일'
+          todos={todos}
+          buttonLabel='완료'
+          buttonColor='#28a745'
+          onClick={completeTodo}
+        />
+        <TodoList
+          title='완료'
+          todos={doneTodos}
+          buttonLabel='삭제'
+          buttonColor='#dc3545'
+          onClick={deleteTodo}
+        />
       </div>
     </div>
   )
-}
+};
 
-export default Todo
+export default Todo; 
