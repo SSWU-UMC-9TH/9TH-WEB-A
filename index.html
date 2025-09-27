@@ -1,0 +1,6 @@
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+// 사용 시점에 타입 지정
+let result = identity<number>(42); // T = number
