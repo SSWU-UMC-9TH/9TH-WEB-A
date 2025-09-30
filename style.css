@@ -82,8 +82,9 @@ body {
 .render-container__item-text {
   flex: 1;
 }
+
+/* 기본 버튼 스타일 */
 .render-container__item-button {
-  background-color: #4093ad;
   color: white;
   border: none;
   padding: 6px 10px;
@@ -92,6 +93,23 @@ body {
   font-size: 12px;
   transition: background-color 0.3s ease;
 }
+
+/* 완료 버튼 */
+.render-container__item-button--complete {
+  background-color: #28a745; /* 초록 */
+}
+.render-container__item-button--complete:hover {
+  background-color: #1e7e34;
+}
+
+/* 삭제 버튼 */
+.render-container__item-button--delete {
+  background-color: #dc3545; /* 빨강 */
+}
+.render-container__item-button--delete:hover {
+  background-color: #a71d2a;
+}
+
 .render-container__item-button:hover {
   background-color: #00769a;
 }
