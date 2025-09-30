@@ -62,11 +62,11 @@ class TodoManager {
 
     if (isDone) {
       button.textContent = "삭제";
-      button.style.backgroundColor = "#dc3545";
+      button.classList.add("render-container__item-button--delete");
       button.addEventListener("click", () => this.deleteTodo(todo));
     } else {
       button.textContent = "완료";
-      button.style.backgroundColor = "#28a745";
+      button.classList.add("render-container__item-button--complete");
       button.addEventListener("click", () => this.completeTodo(todo));
     }
 
