@@ -1,11 +1,10 @@
 import './App.css'
+import MoviePage from './pages/MoviePage'
 
 function App() {
   return (
     <>
-      <h1 className='text-2xl'>hi</h1>
-      
-
+      <MoviePage />
     </>
   )
 }
