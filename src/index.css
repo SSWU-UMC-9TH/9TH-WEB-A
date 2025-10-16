@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* 👇 여기는 그냥 일반 CSS 작성 공간이에요 */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: white;
+  background-color: #242424;
+}
+
+body {
+  margin: 0;
+}
