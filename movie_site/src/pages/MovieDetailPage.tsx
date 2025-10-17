@@ -14,45 +14,40 @@ export const MovieDetailPage = () => {
 
   console.log(movie);
   useEffect(() => {
-    const fetchMovieDetail = async () => {
+    const fetchMovieData = async () => {
       setIsPending(true);
 
       try {
-        const { data } = await axios.get<MovieDetail>(
-          `https://api.themoviedb.org/3/movie/${movieId}?language=ko-KR`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`
-            },
-          }
-        )
-        setMovie(data);
-      } catch {
+        const [movieRes, creditsRes] = await Promise.all([
+          axios.get<MovieDetail>(
+            `https://api.themoviedb.org/3/movie/${movieId}?language=ko-KR`,
+            {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+              },
+            }
+          ),
+          axios.get(
+            `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR`,
+            {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+              },
+            }
+          ),
+        ]);
+
+        setMovie(movieRes.data);
+        setCredits(creditsRes.data);
+      } catch (error) {
+        console.error(error);
         setIsError(true);
       } finally {
         setIsPending(false);
       }
     };
 
-    const fetchMovieCredits = async () => {
-      try {
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=VITE_TMDB_KEY&language=ko-KR`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`
-            },
-          }
-        )
-        setCredits(data);
-      } catch (error) {
-        setIsError(true);
-      } finally {
-        setIsPending(false);
-      }
-    };
-    fetchMovieCredits();
-    fetchMovieDetail();
+    fetchMovieData();
   }, [movieId]);
 
   if (isError) {
