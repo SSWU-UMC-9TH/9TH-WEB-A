@@ -1,54 +1,32 @@
 import { useParams } from "react-router-dom"
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import type { MovieDetail } from "../types/movies";
+import { useCustomFetch } from "../hooks/useCustomFetch";
+import type { CreditsResponse } from "../types/creagits";
 
 export const MovieDetailPage = () => {
   const { movieId } = useParams<{ movieId: string }>();
-  const [movie, setMovie] = useState<MovieDetail | null>(null);
-  const [credits, setCredits] = useState<{ cast: any[]; crew: any[] } | null>(null);
 
-  const [isPending, setIsPending] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const { data, isPending, isError } = useCustomFetch(
+    [
+      {
+        url: `https://api.themoviedb.org/3/movie/${movieId}?language=ko-KR`,
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+        },
+      },
+      {
+        url: `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR`,
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+        },
+      },
+    ],
+    [movieId]
+  );
 
-  console.log(movie);
-  useEffect(() => {
-    const fetchMovieData = async () => {
-      setIsPending(true);
-
-      try {
-        const [movieRes, creditsRes] = await Promise.all([
-          axios.get<MovieDetail>(
-            `https://api.themoviedb.org/3/movie/${movieId}?language=ko-KR`,
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-              },
-            }
-          ),
-          axios.get(
-            `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR`,
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-              },
-            }
-          ),
-        ]);
-
-        setMovie(movieRes.data);
-        setCredits(creditsRes.data);
-      } catch (error) {
-        console.error(error);
-        setIsError(true);
-      } finally {
-        setIsPending(false);
-      }
-    };
-
-    fetchMovieData();
-  }, [movieId]);
+  const movie: MovieDetail | undefined = (data?.[0] as MovieDetail | undefined);
+  const credits: CreditsResponse | undefined = (data?.[1] as CreditsResponse | undefined);
 
   if (isError) {
     return (
@@ -123,9 +101,3 @@ export const MovieDetailPage = () => {
     </div>
   )
 };
-
-  
-
-  
-
-  
