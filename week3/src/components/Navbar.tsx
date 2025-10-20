@@ -10,14 +10,14 @@ const LINKS = [
 
 export const Navbar = () => {
   return (
-    <div className="flex gap-3 p-4">
+    <div className="flex gap-6 p-4 justify-center">
       {LINKS.map(({ to, label }) => (
         <NavLink
           key={to}
           to={to}
           className={({ isActive }) =>
             isActive
-              ? 'text-[#b2dab1] font-bold'
+              ? 'text-[#FFFFF] font-bold'
               : 'text-gray-500'
           }
         >

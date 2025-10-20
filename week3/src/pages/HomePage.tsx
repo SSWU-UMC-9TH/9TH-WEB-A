@@ -19,7 +19,7 @@ const HomePage = () => {
           </p>
           <Link
             to="/movies/popular"
-            className="bg-[#b2dab1] text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            className="bg-[#E50914] text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
           >
             인기 영화 보러가기 →
           </Link>
