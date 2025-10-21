@@ -1,23 +1,22 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import MovieCard from "../components/MovieCard"; // ✅ 추가: 컴포넌트 임포트
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { type MovieResponse, type Movie } from "../types/movie";
 
-// 👇 poster_path 추가
-type TMDBMovie = { id: number; title: string; poster_path: string; overview: string };
-type TMDBResponse = { results: TMDBMovie[] };
-
-export default function MoviePage(): JSX.Element {
+export default function MoviePage() {
   const [status, setStatus] = useState<string>("loading...");
   const [errorMsg, setErrorMsg] = useState<string>("");
-  const [movies, setMovies] = useState<TMDBMovie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const token = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
+      const token = import.meta.env.VITE_TMDB_KEY;
       console.log("TOKEN present? ", !!token); // true 여야 정상
 
       try {
-        const { data, status: httpStatus } = await axios.get<TMDBResponse>(
+        const { data, status: httpStatus } = await axios.get<MovieResponse>(
           "https://api.themoviedb.org/3/movie/popular",
           {
             params: { language: "en-US", page: 1 },
@@ -55,7 +54,10 @@ export default function MoviePage(): JSX.Element {
       </div>
     );
 
-  // ✅ 수정된 부분 (MovieCard로 카드형 UI 렌더링)
+    if (isPending) {
+        return <LoadingSpinner />;
+    }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 text-white">MoviePage</h1>
