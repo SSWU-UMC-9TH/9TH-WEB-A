@@ -1,6 +1,6 @@
 // src/components/MovieCard.tsx
 import { useState } from "react";
-import { Movie } from "../types/movie";
+import { Movie } from "../types/movie.ts";
 
 interface MovieCardProps {
   movie: Movie;
