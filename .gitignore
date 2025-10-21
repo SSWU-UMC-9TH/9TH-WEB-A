@@ -4,9 +4,9 @@ dist/
 **/dist/
 .env
 .env.*
+.vite/
 *.log
 .vscode/
 .idea/
 .DS_Store
 *.local
-.vite/
