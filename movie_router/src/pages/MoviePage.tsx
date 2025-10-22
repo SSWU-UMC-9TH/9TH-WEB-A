@@ -1,52 +1,30 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { type MovieResponse, type Movie } from "../types/movies";
-import MovieCard from "../components/MoviesCard";
-import { LoadingSpinner } from "../components/LoadingSpinner.tsx";
 import { useParams } from "react-router-dom";
+import MovieCard from "../components/MoviesCard";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useCustomFetch } from "../hooks/useCustomFetch";
+import type { MovieResponse } from "../types/movies";
+import { useState } from "react";
 
 export default function MoviePage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isPending, setIsPending] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const { category } = useParams<{ category: string }>();
   const [page, setPage] = useState(1);
 
-  const { category } = useParams<{
-    category: string;
-  }>();
+  const { data, loading, error } = useCustomFetch<MovieResponse>(
+    `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`,
+    {
+      headers: { Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}` },
+    },
+    [category, page]
+  );
 
-  useEffect(() => {
-    const fetchMovie = async () => {
-      setIsPending(true);
-
-      try {
-        const { data } = await axios.get<MovieResponse>(
-          `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-            },
-          }
-        );
-        setMovies(data.results);
-        setIsPending(false);
-      } catch {
-        setIsError(true);
-      } finally {
-        setIsPending(false);
-      }
-    };
-
-    fetchMovie();
-  }, [page, category]);
-
-  if (isError) {
+  if (error)
     return (
       <div className="flex justify-center items-center h-screen">
-        <span className="text-red-500 text-2xl">에러가 발생했습니다.</span>
+        <span className="text-red-500 text-2xl">
+          영화 정보를 불러오는 중 오류가 발생했습니다.
+        </span>
       </div>
     );
-  }
 
   return (
     <>
@@ -69,15 +47,13 @@ export default function MoviePage() {
         </button>
       </div>
 
-      {isPending && (
+      {loading ? (
         <div className="flex items-center justify-center h-dvh">
           <LoadingSpinner />
         </div>
-      )}
-
-      {!isPending && (
+      ) : (
         <div className="p-10 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {movies.map((movie) => (
+          {data?.results.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
           ))}
         </div>
