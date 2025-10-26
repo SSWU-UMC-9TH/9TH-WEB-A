@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { ChangeEvent } from 'react';
+import { useState, useEffect } from "react";
+import type { ChangeEvent } from "react";
 
 interface UseFormProps<T> {
   initialValue: T;
@@ -8,12 +8,8 @@ interface UseFormProps<T> {
 
 function useForm<T>({ initialValue, validate }: UseFormProps<T>) {
   const [values, setValues] = useState<T>(initialValue);
-  const [touched, setTouched] = useState<Record<keyof T, boolean>>(
-    {} as Record<keyof T, boolean>,
-  );
-  const [errors, setErrors] = useState<Record<keyof T, string>>(
-    {} as Record<keyof T, string>,
-  );
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (name: keyof T, text: string) => {
     setValues({
