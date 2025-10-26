@@ -1,78 +1,79 @@
-import useForm from '../hooks/useForm';
-import type { UserSigninInformation } from '../utils/validate';
-import { validateSignin } from '../utils/validate';
-import { useNavigate } from 'react-router-dom';
+import { postSignin } from "../apis/auth";
+import { LOCAL_STORAGE_KEY } from "../constants/key";
+import useForm from "../hooks/useForm";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { validateSignin, type UserSigninInformation } from "../utils/validate";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setItem } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
   const { values, errors, touched, getInputProps } =
     useForm<UserSigninInformation>({
       initialValue: {
-        email: '',
-        password: '',
+        email: "",
+        password: "",
       },
       validate: validateSignin,
     });
 
-  const handleSubmit = () => {
-    console.log('폼 제출:', values);
+  const handleSubmit = async () => {
+    try {
+      const response = await postSignin(values);
+      setItem(response.data.accessToken);
+      console.log("response:", response);
+    } catch (error) {
+      alert(error?.message || "Unknown error");
+    }
   };
 
   const isDisabled =
-    Object.values(errors || {}).some((error) => error?.length > 0) ||
-    Object.values(values).some((value) => value === '');
+    Object.values(errors || {}).some((error) => error.length > 0) ||
+    Object.values(values).some((value) => value === "");
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="absolute top-10 left-4
-        w-10 h-10
-        flex items-center justify-center
-        bg-white rounded-full shadow-md
-        text-blue-600 text-lg font-bold
-        hover:bg-blue-50 hover:scale-110 transition"
-      >
-        &lt;
-      </button>
-
       <div className="flex flex-col gap-3">
+        <div className="relative w-[300px] flex items-center justify-center h-12">
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute left-0 text-xl pl-4"
+          >
+            {"<"}
+          </button>
+          <h1 className="text-xl bold font-bold">로그인</h1>
+        </div>
         <input
-          {...getInputProps('email')}
-          name="email"
-          type="email"
-          className={`border w-[300px] p-[10px] rounded-sm focus:border-[#807bff] ${
-            errors.email && touched?.email
-              ? 'border-red-500 bg-red-200'
-              : 'border-gray-300'
+          {...getInputProps("email")}
+          className={`border w-[300px] p-[10px] focus:border-[#5F7317] rounded-sm placeholder-[#C7C7C7] ${
+            errors?.email && touched?.email
+              ? "border-red-500 bg-red-200"
+              : "border-gray-300"
           }`}
-          placeholder="이메일"
+          type={"email"}
+          placeholder={"email"}
         />
         {errors?.email && touched?.email && (
           <div className="text-red-500 text-sm">{errors.email}</div>
         )}
-
         <input
-          {...getInputProps('password')}
-          name="password"
-          type="password"
-          className={`border w-[300px] p-[10px] rounded-sm focus:border-[#807bff] ${
-            errors.password && touched?.password
-              ? 'border-red-500 bg-red-200'
-              : 'border-gray-300'
+          {...getInputProps("password")}
+          className={`border w-[300px] p-[10px] focus:border-[#324001] rounded-sm placeholder-[#C7C7C7] ${
+            errors?.password && touched?.password
+              ? "border-red-500 bg-red-200"
+              : "border-gray-300"
           }`}
-          placeholder="비밀번호"
+          type={"password"}
+          placeholder={"password"}
         />
         {errors?.password && touched?.password && (
           <div className="text-red-500 text-sm">{errors.password}</div>
         )}
-
         <button
           type="button"
           onClick={handleSubmit}
           disabled={isDisabled}
-          className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300"
+          className="w-full bg-[#343A40] text-white py-2 rounded-md text-lg font-medium hover:bg-[#000] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           로그인
         </button>
