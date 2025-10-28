@@ -17,7 +17,7 @@ function validateUser(values: UserSigninInformation) {
     errors.email = "이메일 형식이 올바르지 않습니다.";
   }
 
-  if (!(values.password.length >= 8 && values.password.length < 20)) {
+  if (!(values.password.length >= 8 && values.password.length <= 20)) {
     errors.password = "비밀번호는 8자 이상 20자 이하로 입력해주세요.";
   }
 

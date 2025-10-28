@@ -1,8 +1,7 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+interface ImportMetaEnv {
+  readonly VITE_SERVER_API_URL: string;
+}
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-});
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
