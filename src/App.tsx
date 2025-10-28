@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import HomeLayout from './layouts/HomeLayout';
 import SignupPage from './pages/SignupPage'
+import MyPage from './pages/MyPage';
+
 
 
 // 1. 홈페이지
@@ -20,6 +22,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignupPage /> },
+      { path: "my", element: <MyPage /> }
     ],
   },
 ]);

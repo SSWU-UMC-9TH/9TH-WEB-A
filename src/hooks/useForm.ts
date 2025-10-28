@@ -22,7 +22,6 @@ function useForm<T>({ initialValue, validate }: UseFormProps<T>) {
   setTouched(prev => ({ ...prev, [name]: true }));
 };
 
-
   // 이메일 인풋, 패스워드 인풋, 속성들을 좀 가져오는 것
 const getInputProps = (name: keyof T) => {
   const value: T[keyof T] = values[name];
