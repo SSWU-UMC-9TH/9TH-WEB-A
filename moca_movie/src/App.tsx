@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import HomeLayout from "./layouts/HomeLayout";
 import SignupPage from "./pages/SignupPage";
 import MyPage from "./pages/MyPage";
+import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer position="top-center" autoClose={2000} />
+    </>
   );
 }
 

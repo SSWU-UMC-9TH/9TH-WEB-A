@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { postSignin } from "../apis/auth";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import useForm from "../hooks/useForm";
@@ -21,8 +22,9 @@ const LoginPage = () => {
       const response = await postSignin(values);
       setItem(response.data.accessToken);
       console.log("response:", response);
+      toast.success("로그인 성공"); 
     } catch (error) {
-      alert(error?.message || "Unknown error");
+      toast.error(error?.response?.data?.message || error?.message || "Unknown error");
     }
   }
 
