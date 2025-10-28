@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-inner-spin-button {
+  display: none !important;
+}
+
+input[type="password"]::-moz-show-password-button {
+  display: none !important;
+}
