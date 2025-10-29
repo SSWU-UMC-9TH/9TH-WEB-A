@@ -1,45 +1,26 @@
-import { useEffect, useState } from "react"
-import axios from 'axios';
 import { type MovieResponse, type Movie } from "../types/movies";
 import MovieCard from "../components/MoviesCard";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useParams } from "react-router-dom";
+import { useCustomFetch } from "../hooks/useCustomFetch";
+import { useState } from "react";
 
 export default function MoviePage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isPending, setIsPending] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const { category } = useParams<{ category: string }>();
   const [page, setPage] = useState(1);
 
-  const { category} = useParams<{
-    category: string;
-  }>();
+  const requests = [
+    {
+      url: `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`,
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+      },
+    },
+  ];
 
-  useEffect(() => {
-    const fetchMovie = async () => {
-      setIsPending(true);
+  const { data, isPending, isError } = useCustomFetch<MovieResponse>(requests, [category, page]);
 
-      try {
-        const { data } = await axios.get<MovieResponse>(
-          `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-            },
-          }
-        );
-
-        setMovies(data.results);
-        setIsPending(false);
-      } catch {
-        setIsError(true);
-      } finally {
-        setIsPending(false);
-      }
-    };
-
-    fetchMovie();
-  }, [page, category]);
+  const movies: Movie[] = data?.[0]?.results || [];
 
   if (isError) {
     return (
