@@ -30,6 +30,10 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = import.meta.env.VITE_SERVER_API + "/v1/auth/google/login";
+  }
+
   const isDisabled =
     Object.values(errors || {}).some((error) => error.length > 0) ||
     Object.values(values).some((value) => value === "");
@@ -66,6 +70,17 @@ const LoginPage = () => {
           className='w-full bg-[#343A40] text-white py-2 rounded-md text-lg font-medium hover:bg-[#000] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed'
         >
           로그인
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className='w-full bg-[#343A40] text-white py-2 rounded-md text-lg font-medium hover:bg-[#000] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed'
+        >
+          <div className="flex items-center justify-center gap-4">
+            <img src={"/images/googlelogo.svg"} alt="Google Logo Image" className="w-7 h-7" />
+            <span>Google 로그인</span>
+          </div>
         </button>
       </div>
     </div>
