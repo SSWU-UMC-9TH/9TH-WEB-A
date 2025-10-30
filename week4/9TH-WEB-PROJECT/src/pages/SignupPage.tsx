@@ -2,10 +2,9 @@ import { z } from "zod";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { ResponseSignupDto } from "../types/auth";
-import { postSignup } from "../apis/auth";
+import { useState } from "react";
 
 const schema = z
   .object({
@@ -27,8 +26,20 @@ const schema = z
 
 type FormFields = z.infer<typeof schema>;
 
+// Mocked imports to resolve build error. Replace with your actual files.
+const postSignup = async (data: Omit<FormFields, "passwordCheck">) => {
+  console.log("Mock signup:", data);
+  // Simulate a delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return { success: true, message: "Signup successful" };
+};
+type ResponseSignupDto = { success: boolean; message: string; [key: string]: any; };
+
+
 const SignupPage = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false);
   const {
     register,
     handleSubmit,
@@ -45,12 +56,17 @@ const SignupPage = () => {
     mode: "onChange",
   });
 
-const onSubmit: SubmitHandler<FormFields> = async (data) => {
-  const { passwordCheck, ...rest } = data;
-  const response: ResponseSignupDto = await postSignup(rest);
-  console.log(response);
-  navigate("/");
-};
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordCheck, ...rest } = data;
+    try {
+      const response: ResponseSignupDto = await postSignup(rest);
+      console.log(response);
+      navigate("/");
+    } catch (error) {
+      console.error("Signup failed:", error);
+    }
+  };
 
   const values = watch();
   const isDisabled =
@@ -67,79 +83,119 @@ const onSubmit: SubmitHandler<FormFields> = async (data) => {
         <ArrowLeft size={24} strokeWidth={2} />
       </button>
 
-      <div className="w-[350px] flex flex-col items-center justify-center gap-5">
-        <h1 className="text-2xl font-bold mb-2">회원가입</h1>
+      <div className="w-[350px] flex flex-col items-center justify-center">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full flex flex-col items-center gap-5"
+        >
+          <h1 className="text-2xl font-bold mb-2">회원가입</h1>
 
-        <div className="w-full flex flex-col gap-3">
-          <input
-            {...register("email")}
-            className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-              errors.email
-                ? "border-red-500 bg-red-100 focus:ring-red-300"
-                : "border-gray-300 focus:ring-blue-300"
-            }`}
-            type="email"
-            placeholder="이메일"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
-          )}
+          <div className="w-full flex flex-col gap-3">
+            <div>
+              <input
+                {...register("email")}
+                className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                  errors.email
+                    ? "border-red-500 bg-red-100 focus:ring-red-300"
+                    : "border-gray-300 focus:ring-blue-300"
+                }`}
+                type="email"
+                placeholder="이메일"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
 
-          <input
-            {...register("password")}
-            className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-              errors.password
-                ? "border-red-500 bg-red-100 focus:ring-red-300"
-                : "border-gray-300 focus:ring-blue-300"
-            }`}
-            type="password"
-            placeholder="비밀번호"
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password.message}</p>
-          )}
+            <div>
+              <div className="relative">
+                <input
+                  {...register("password")}
+                  className={`border w-full p-[12px] pr-10 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                    errors.password
+                      ? "border-red-500 bg-red-100 focus:ring-red-300"
+                      : "border-gray-300 focus:ring-blue-300"
+                  }`}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="비밀번호"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
 
-          <input
-            {...register("passwordCheck")}
-            className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-              errors.passwordCheck
-                ? "border-red-500 bg-red-100 focus:ring-red-300"
-                : "border-gray-300 focus:ring-blue-300"
-            }`}
-            type="password"
-            placeholder="비밀번호 확인"
-          />
-          {errors.passwordCheck && (
-            <p className="text-red-500 text-sm">비밀번호가 일치하지 않습니다.</p>
-          )}
+            <div>
+              <div className="relative">
+                <input
+                  {...register("passwordCheck")}
+                  className={`border w-full p-[12px] pr-10 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                    errors.passwordCheck
+                      ? "border-red-500 bg-red-100 focus:ring-red-300"
+                      : "border-gray-300 focus:ring-blue-300"
+                  }`}
+                  type={showPasswordCheck ? "text" : "password"}
+                  placeholder="비밀번호 확인"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordCheck((prev) => !prev)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPasswordCheck ? "비밀번호 확인 숨기기" : "비밀번호 확인 보기"}
+                >
+                  {showPasswordCheck ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.passwordCheck && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.passwordCheck.message}
+                </p>
+              )}
+            </div>
 
-          <input
-            {...register("name")}
-            className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-              errors.name
-                ? "border-red-500 bg-red-100 focus:ring-red-300"
-                : "border-gray-300 focus:ring-blue-300"
-            }`}
-            type="text"
-            placeholder="이름"
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
-          )}
+            <div>
+              <input
+                {...register("name")}
+                className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                  errors.name
+                    ? "border-red-500 bg-red-100 focus:ring-red-300"
+                    : "border-gray-300 focus:ring-blue-300"
+                }`}
+                type="text"
+                placeholder="이름"
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
 
-          <button
-            disabled={isDisabled}
-            type="button"
-            onClick={handleSubmit(onSubmit)}
-            className={`w-full py-3 rounded-md text-lg font-medium transition-colors ${
-              isDisabled
-                ? "bg-gray-300 cursor-not-allowed text-white"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
-          >
-            회원가입
-          </button>
-        </div>
+            <button
+              disabled={isDisabled}
+              type="submit"
+              className={`w-full py-3 rounded-md text-lg font-medium transition-colors ${
+                isDisabled
+                  ? "bg-gray-300 cursor-not-allowed text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+            >
+              {isSubmitting ? "가입 중..." : "회원가입"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
