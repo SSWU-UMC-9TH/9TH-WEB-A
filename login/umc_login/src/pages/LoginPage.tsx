@@ -25,8 +25,16 @@ const LoginPage = () => {
   const handleSubmit = async () => {
     try {
       await login(values);
-      navigate("/my");
+      navigate("/");
     } catch (error) {}
+  };
+
+  const handleGoogleLogin = () => {
+    const url = import.meta.env.VITE_SERVER_URL + "/v1/auth/google/login";
+    console.log("[Google Login] 버튼 클릭 → 이동 시도 URL:", url);
+
+    // 브라우저가 직접 Google 로그인 페이지로 이동
+    window.location.href = url;
   };
 
   const isDisabled =
@@ -60,7 +68,7 @@ const LoginPage = () => {
         )}
         <input
           {...getInputProps("password")}
-          className={`border w-[300px] p-[10px] focus:border-[#324001] rounded-sm placeholder-[#C7C7C7] ${
+          className={`border w-[300px] p-[10px] focus:border-blue-300 rounded-sm placeholder-[#C7C7C7] ${
             errors?.password && touched?.password
               ? "border-red-500 bg-red-200"
               : "border-gray-300"
@@ -75,9 +83,24 @@ const LoginPage = () => {
           type="button"
           onClick={handleSubmit}
           disabled={isDisabled}
-          className="w-full bg-[#343A40] text-white py-2 rounded-md text-lg font-medium hover:bg-[#000] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           로그인
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          <div className="flex items-center justify-center gap-4">
+            <img
+              src={"/images/googlelogo.png"}
+              alt="Google Logo Image"
+              className="w-7 h-7"
+            />
+            <span>Google 로그인</span>
+          </div>
         </button>
       </div>
     </div>
