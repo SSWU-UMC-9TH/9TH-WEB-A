@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ResponseMyInfoDto } from "../types/auth";
 import { getMyInfo } from "../apis/auth";
 import { useAuth } from "../context/AuthContext";
@@ -8,7 +8,7 @@ const MyPage = () => {
   const { logout } = useAuth(); 
   const navigate = useNavigate();
   const [data, setData] = useState<ResponseMyInfoDto>([]);
-
+  
   useEffect(() => {
     const getData = async () => {
       const response = await getMyInfo();
