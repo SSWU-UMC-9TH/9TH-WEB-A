@@ -11,6 +11,7 @@ let refreshPromise: Promise<string> | null = null;
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -83,6 +84,7 @@ axiosInstance.interceptors.response.use(
             );
             removeAccessToken();
             removeRefreshToken();
+            return Promise.reject(error);
           })
           .finally(() => {
             refreshPromise = null;
@@ -94,5 +96,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance.request(originalRequest);
       });
     }
+
+    return Promise.reject(error);
   }
 );
