@@ -1,8 +1,8 @@
 import axios from "axios";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { LOCAL_STORAGE_KEY } from "../constants/key";
 
-const BASE_URL = "http://localhost:8000";
-const ACCESS_TOKEN_KEY = "accessToken";
-const REFRESH_TOKEN_KEY = "refreshToken";
+const BASE_URL = import.meta.env.VITE_SERVER_API_URL;
 
 let refreshPromise: Promise<string> | null = null;
 
@@ -12,15 +12,17 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (token) {
+    const { getItem } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+    const accessToken = getItem();
+
+    if (accessToken) {
       try {
-        const parsed = JSON.parse(token);
-        config.headers.Authorization = `Bearer ${parsed}`;
-      } catch (e) {
-        console.error("Failed to parse accessToken:", e);
+        config.headers.Authorization = `Bearer ${JSON.parse(accessToken)}`;
+      } catch {
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
     }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -31,51 +33,49 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 에러이면서 아직 재시도하지 않은 요청만 처리
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // refresh 자체가 실패한 경우.. 로그아웃 처리
       if (originalRequest.url === "/v1/auth/refresh") {
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        const { removeItem: removeAccess } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+        const { removeItem: removeRefresh } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+        removeAccess();
+        removeRefresh();
         window.location.href = "/login";
         return Promise.reject(error);
       }
 
-      // 이미 refresh 진행 중이면 그 Promise를 재사용
       if (!refreshPromise) {
-        const refreshToken = JSON.parse(
-          localStorage.getItem(REFRESH_TOKEN_KEY) || "null"
-        );
+        const { getItem: getRefresh } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+        const refreshToken = getRefresh();
 
         if (!refreshToken) {
           window.location.href = "/login";
           return Promise.reject(error);
         }
 
-        refreshPromise = axiosInstance
-          .post("/v1/auth/refresh", { refresh: refreshToken })
+        refreshPromise = axios
+          .post(`${BASE_URL}/v1/auth/refresh`, { refresh: refreshToken })
           .then((res) => {
-            const newAccessToken = res.data?.data?.accessToken;
-            const newRefreshToken = res.data?.data?.refreshToken;
+            const { setItem: setAccess } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+            const { setItem: setRefresh } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
 
-            if (newAccessToken && newRefreshToken) {
-              localStorage.setItem(ACCESS_TOKEN_KEY, JSON.stringify(newAccessToken));
-              localStorage.setItem(REFRESH_TOKEN_KEY, JSON.stringify(newRefreshToken));
-              return newAccessToken;
+            const newAccess = res.data?.data?.accessToken;
+            const newRefresh = res.data?.data?.refreshToken;
+
+            if (newAccess && newRefresh) {
+              setAccess(newAccess);
+              setRefresh(newRefresh);
+              return newAccess;
             } else {
               throw new Error("Invalid token response");
             }
           })
           .catch((err) => {
-            console.error("Refresh token failed:", err);
-            localStorage.removeItem(ACCESS_TOKEN_KEY);
-            localStorage.removeItem(REFRESH_TOKEN_KEY);
+            const { removeItem: removeAccess } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+            const { removeItem: removeRefresh } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+            removeAccess();
+            removeRefresh();
             window.location.href = "/login";
             return Promise.reject(err);
           })
@@ -83,8 +83,7 @@ axiosInstance.interceptors.response.use(
             refreshPromise = null;
           });
       }
-
-      // refresh 완료까지 기다렸다가 재시도
+      
       const newAccessToken = await refreshPromise;
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       return axiosInstance(originalRequest);
