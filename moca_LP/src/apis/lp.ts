@@ -8,3 +8,8 @@ export const getLpList = async (paginationDto: PaginationDto): Promise<ResponseL
   });
   return data;
 };
+
+export const getLpDetail = async (id: string):Promise<ResponseLpListDto> => {
+  const { data } = await axiosInstance.get(`/v1/lps/${id}`);
+  return data;
+};

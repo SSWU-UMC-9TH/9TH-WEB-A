@@ -14,6 +14,8 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
   const [data, setData] = useState<ResponseMyInfoDto>([]);
 
   useEffect(() => {
+    if (!accessToken) return;
+
     const getData = async () => {
       const response = await getMyInfo();
       console.log(response);
@@ -22,7 +24,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
     };
   
     getData();
-  }, []);
+  }, [accessToken]);
 
   const handleLogout = async () => {
     await logout();
