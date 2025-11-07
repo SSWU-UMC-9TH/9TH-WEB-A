@@ -1,15 +1,16 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useForm from "../hooks/useForm";
 import { validateSignin, type UserSigninInformation } from "../utils/validate";
-import { ArrowLeft } from "lucide-react";
-import { postSignin } from "../apis/auth";
-import type { ResponseSigninDto } from "../types/auth";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { LOCAL_STORAGE_KEY } from "../constants/key";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
-  const { setItem } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   const { values, errors, touched, getInputProps } =
     useForm<UserSigninInformation>({
       initialValue: {
@@ -18,16 +19,17 @@ const LoginPage = () => {
       },
       validate: validateSignin,
     });
-  
-const handleSubmit = async () => {
-  console.log(values);
-  try {
-    const response: ResponseSigninDto = await postSignin(values);
-    setItem(response.data.accessToken);
-    console.log(response);
-  } catch (error: any) {
-    alert(error?.message);
-  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoginError(null);
+
+    try {
+      await login(values);
+    } catch (error: any) {
+      console.error("로그인 실패", error);
+      setLoginError(error?.message || "로그인에 실패했습니다.");
+    }
   };
 
   const isDisabled =
@@ -36,7 +38,6 @@ const handleSubmit = async () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white relative">
-      
       <button
         onClick={() => navigate(-1)}
         className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 transition"
@@ -44,46 +45,64 @@ const handleSubmit = async () => {
         <ArrowLeft size={24} strokeWidth={2} />
       </button>
 
-      <div className="w-[350px] flex flex-col items-center justify-center gap-5">
-        <h1 className="text-2xl font-bold mb-2">로그인</h1>
+      <div className="w-[350px] flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold mb-5">로그인</h1>
 
-        <div className="w-full flex flex-col gap-3">
-          <input
-            {...getInputProps("email")}
-            className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-              errors?.email && touched?.email
-                ? "border-red-500 bg-red-100 focus:ring-red-300"
-                : "border-gray-300 focus:ring-blue-300"
-            }`}
-            type="email"
-            placeholder="이메일"
-          />
-          {errors?.email && touched?.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
-          )}
-
-          <div className="relative">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
+          <div>
             <input
-              {...getInputProps("password")}
-              className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 pr-10 ${
-                errors?.password && touched?.password
+              {...getInputProps("email")}
+              type="email"
+              placeholder="이메일"
+              autoComplete="email"
+              className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                errors?.email && touched?.email
                   ? "border-red-500 bg-red-100 focus:ring-red-300"
                   : "border-gray-300 focus:ring-blue-300"
               }`}
-              type="password"
-              placeholder="비밀번호"
             />
+            {errors?.email && touched?.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
-          {errors?.password && touched?.password && (
-            <p className="text-red-500 text-sm">{errors.password}</p>
+          <div>
+            <div className="relative">
+              <input
+                {...getInputProps("password")}
+                type={showPassword ? "text" : "password"}
+                placeholder="비밀번호"
+                autoComplete="current-password"
+                className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 pr-10 ${
+                  errors?.password && touched?.password
+                    ? "border-red-500 bg-red-100 focus:ring-red-300"
+                    : "border-gray-300 focus:ring-blue-300"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {errors?.password && touched?.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          {loginError && (
+            <p className="text-red-500 text-sm text-center w-full">
+              {loginError}
+            </p>
           )}
 
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             disabled={isDisabled}
-            className={`w-full py-3 rounded-md text-lg font-medium transition-colors ${
+            className={`w-full py-3 rounded-md text-lg font-medium transition-colors mt-2 ${
               isDisabled
                 ? "bg-gray-300 cursor-not-allowed text-white"
                 : "bg-blue-600 hover:bg-blue-700 text-white"
@@ -91,7 +110,7 @@ const handleSubmit = async () => {
           >
             로그인
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

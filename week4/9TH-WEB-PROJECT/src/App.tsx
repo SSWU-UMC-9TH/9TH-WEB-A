@@ -3,17 +3,18 @@ import HomeLayout from "./layouts/HomeLayout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import MyPage from "./pages/MyPage"; // ✅ 새로 추가된 부분
+import MyPage from "./pages/MyPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedLayout from "./layouts/ProtectedLayout";
 
-const router = createBrowserRouter([
+const publicRoutes = [
   {
     path: "/",
     element: <HomeLayout />,
     errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "mypage", element: <MyPage /> },
     ],
   },
   {
@@ -24,10 +25,27 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <SignupPage />,
   },
-]);
+];
+
+const protectedRoutes = [
+  {
+    path: "/",
+    element: <ProtectedLayout />,
+    errorElement: <NotFoundPage />,
+    children: [
+      { path: "my", element: <MyPage /> },
+    ],
+  },
+];
+
+const router = createBrowserRouter([...publicRoutes, ...protectedRoutes]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;
