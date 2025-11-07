@@ -31,11 +31,15 @@ const publicRoutes: RouteObject[] = [
 const protectedRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <ProtectedLayout />,
+    element: (
+      <ProtectedLayout>
+        <HomeLayout />
+      </ProtectedLayout>
+    ),
     errorElement: <NotFoundPage />,
     children: [
       { path: 'my', element: <MyPage /> },
-      { path: "lp/:id", element: <LpDetailPage /> },
+      { path: "lp/:lpId", element: <LpDetailPage /> },
     ]
   }
 ]

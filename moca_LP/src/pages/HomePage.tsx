@@ -1,27 +1,39 @@
-import { useState } from "react";
-import useGetLpList from "../hooks/queries/useGetLpList";
+import { useEffect, useState } from "react";
 import { PAGINATION_ORDER } from "../enums/common";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { formatDistanceToNow } from "date-fns";
-import { Heart } from "lucide-react";
+import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
+import { useInView } from "react-intersection-observer"
+import LpCard from "../components/LpCard/LpCard";
+import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
-  const { accessToken } = useAuth() || {};
-  const navigate = useNavigate();
 
-  const { data, isPending, isError } = useGetLpList({
-    search,
-    order,
-  });
+  // const { data, isPending, isError } = useGetLpList({
+  //   search,
+  //   order,
+  // });
 
-  console.log({ data });
+  const {
+    data: lps,
+    isFetching,
+    hasNextPage,
+    isPending,
+    fetchNextPage,
+    isError
+  } = useGetInfiniteLpList(10, search, PAGINATION_ORDER.asc);
 
-  if (isPending) {
-    return <div>로딩중...</div>;
-  }
+  
+
+  const { ref, inView } = useInView({
+    threshold: 0,
+  })
+
+  useEffect(() => {
+    if (inView) {
+      !isFetching && hasNextPage && fetchNextPage();
+    }
+  }, [inView, isFetching, hasNextPage, fetchNextPage]);
 
   if (isError) {
     return <div>에러 발생!</div>;
@@ -51,39 +63,18 @@ const HomePage = () => {
           최신순
         </button>
       </div>
-
-      {/* LP 카드 그리드 */}
+      
+      {isPending && <LpCardSkeletonList count={20} />}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {data?.map((lp) => (
-          <div
-            key={lp.id}
-            className="relative group overflow-hidden rounded-md shadow-md hover:scale-105 transition-transform duration-300"
-          >
-            <img
-              src={lp.thumbnail}
-              alt={lp.title}
-              className="w-full h-64 object-cover"
-            />
-            
-
-            <div
-              className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col justify-end p-3 text-white cursor-pointer"
-              onClick={() => navigate(`/lp/${lp.id}`)}
-            >
-              <h3 className="text-md font-semibold">{lp.title}</h3>
-              <div className="flex justify-between items-center text-sm text-white">
-                <p>{formatDistanceToNow(new Date(lp.createdAt), { addSuffix: true })}</p>
-
-                <div className="flex items-center gap-1">
-                  <Heart className="w-3 h-3 text-white fill-white" />
-                  <p>{lp.likes.length}</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        ))}
+        {lps?.pages
+          ?.map((page) => page.data.data)
+          ?.flat()
+          ?.map((lp) =>
+            <LpCard key={lp.id} lp={lp} />
+        )}
+        {!isFetching && <LpCardSkeletonList count={20} />}
       </div>
+      <div ref={ref} className="h-2" />
     </div>
   );
 };
