@@ -5,45 +5,39 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+  const { accessToken, logout } = useAuth();
   const [data, setData] = useState<ResponseMyInfoDto | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!accessToken) return;
+
     const getData = async () => {
-      try {
-        const response = await getMyInfo();
-        console.log(response);
-        setData(response);
-      } catch (error) {
-        console.error("내 정보 불러오기 오류:", error);
-      }
+      const response = await getMyInfo();
+      console.log(response);
+      setData(response);
     };
 
     getData();
-  }, []);
+  }, [accessToken]);
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (
     <div>
       <h1>{data?.data?.name}님 환영합니다</h1>
-      {data?.data?.avatar && (
-        <img src={data.data.avatar as string} alt="프로필 이미지" />
-      )}
+      <img src={data?.data?.avatar as string} alt="구글 로고" />
       <h1>{data?.data?.email}</h1>
-
       <button
         onClick={handleLogout}
-        className="cursor-pointer rounded bg-blue-300 rounded-sm-p-5 hover:scale-90"
+        className="cursor-pointer rounded bg-[#343A40] px-4 py-2 text-white hover:bg-[#212529]"
       >
         로그아웃
       </button>
     </div>
   );
 };
-
 export default MyPage;
