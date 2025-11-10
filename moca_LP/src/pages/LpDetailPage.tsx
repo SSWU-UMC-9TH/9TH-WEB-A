@@ -141,7 +141,6 @@ const LpDetailPage = () => {
                     comment={comment}
                     lpId={lpIdNumber}
                     myId={me?.data.id}
-                    refetch={refetch}
                   />
                 ))
               )

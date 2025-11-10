@@ -2,23 +2,15 @@ import { useState } from "react";
 import { Pencil, Trash2, MoreVertical } from "lucide-react";
 import useDeleteComment from "../../hooks/mutations/useDeleteCommet";
 import useUpdateComment from "../../hooks/mutations/useUpdateComment";
+import type { Comments } from "../../types/lp";
 
 interface CommentItemProps {
-  comment: {
-    id: number;
-    content: string;
-    author: {
-      id: number;
-      name: string;
-      avatar: string;
-    };
-  };
+  comment: Comments;
   lpId: number;
   myId: number | undefined;
-  refetch: () => void;
 }
 
-const CommentItem = ({ comment, lpId, myId, refetch }: CommentItemProps) => {
+const CommentItem = ({ comment, lpId, myId }: CommentItemProps) => {
   const isMine = comment.author.id === myId;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +29,6 @@ const CommentItem = ({ comment, lpId, myId, refetch }: CommentItemProps) => {
       {
         onSuccess: () => {
           setIsEditing(false);
-          refetch();
         },
       }
     );
@@ -45,9 +36,7 @@ const CommentItem = ({ comment, lpId, myId, refetch }: CommentItemProps) => {
 
   const handleDelete = () => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
-    deleteComment(comment.id, {
-      onSuccess: () => refetch(),
-    });
+    deleteComment(comment.id);
   };
 
   return (
@@ -111,7 +100,11 @@ const CommentItem = ({ comment, lpId, myId, refetch }: CommentItemProps) => {
         </div>
       ) : (
         <div className="flex flex-row gap-2">
-          <img className="w-6 h-6 object-cover rounded-lg" src={comment.author.avatar} />
+          <img
+            className="w-6 h-6 object-cover rounded-lg"
+            src={comment.author.avatar ?? undefined}
+            alt={`${comment.author.name}'s avatar`}
+          />
           <div className="flex flex-col">
             <p className="font-semibold text-white">{comment.author.name}</p>
             <p className="text-gray-300">{comment.content}</p>
