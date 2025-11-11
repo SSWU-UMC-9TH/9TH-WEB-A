@@ -7,12 +7,7 @@ import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
-  const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
-
-  // const { data, isPending, isError } = useGetLpList({
-  //   search,
-  //   order,
-  // });
+  const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.asc);
 
   const {
     data: lps,
@@ -21,6 +16,7 @@ const HomePage = () => {
     isPending,
     fetchNextPage,
     isError,
+    refetch
   } = useGetInfiniteLpList(10, search, order);
 
   const { ref, inView } = useInView({
@@ -34,8 +30,20 @@ const HomePage = () => {
   }, [inView, isFetching, hasNextPage, fetchNextPage]);
 
   if (isError) {
-    return <div>에러 발생!</div>;
-  }
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-700">
+        <p className="mb-3 text-lg font-medium">
+          LP 목록을 불러오는 중 오류가 발생했습니다.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-[#212529] text-white rounded-md hover:bg-[#343a40] transition-colors"
+        >
+          다시 시도하기
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen">
