@@ -1,15 +1,17 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ResponseMyInfoDto } from "../types/auth";
 import { getMyInfo } from "../apis/auth";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
-  const { logout } = useAuth(); 
-  const navigate = useNavigate();
+  const { accessToken, logout } = useAuth(); 
   const [data, setData] = useState<ResponseMyInfoDto>([]);
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
+    if (!accessToken) return;
+
     const getData = async () => {
       const response = await getMyInfo();
       console.log(response);
@@ -18,11 +20,11 @@ const MyPage = () => {
     };
 
     getData();
-  }, [])
+  }, [accessToken])
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (
