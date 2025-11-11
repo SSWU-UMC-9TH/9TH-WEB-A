@@ -20,10 +20,8 @@ const HomePage = () => {
     hasNextPage,
     isPending,
     fetchNextPage,
-    isError
-  } = useGetInfiniteLpList(10, search, PAGINATION_ORDER.asc);
-
-  
+    isError,
+  } = useGetInfiniteLpList(10, search, order);
 
   const { ref, inView } = useInView({
     threshold: 0,
