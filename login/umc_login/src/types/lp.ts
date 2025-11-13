@@ -1,36 +1,74 @@
-import type { CursorBasedResponse } from "./common";
+import type { CommonResponse, CursorBasedResponse } from "./common";
 
 export type Tag = {
   id: number;
   name: string;
 };
-
 export type Likes = {
   id: number;
   userId: number;
   lpId: number;
 };
-
-// 1. LP 객체 자체의 타입을 'Lp'로 분리해 정의합니다.
-export type Lp = {
+export type LP = {
   id: number;
   title: string;
   content: string;
   thumbnail: string;
   published: boolean;
-  authorId: number;
+  authorld: number;
   createdAt: Date;
   updatedAt: Date;
   tags: Tag[];
   likes: Likes[];
 };
 
-// 2. ResponseLpListDto의 data 속성이 'Lp[]'(Lp의 배열)을 갖도록 수정합니다.
-export type ResponseLpListDto = CursorBasedResponse<{
-  data: Lp[];
+export type RequestLpDto = {
+  lpId: number;
+};
+
+export type ResponseLpDto = CommonResponse<LP>;
+
+export type ResponseLPListDto = CursorBasedResponse<LP[]>;
+
+export type ResponseLikeLpDto = CommonResponse<{
+  id: number;
+  userId: number;
+  lpId: number;
 }>;
 
-// 3. (추가) LP 상세 정보(1개)를 위한 타입을 만듭니다.
-export type ResponseLpDetailDto = CursorBasedResponse<{
-  data: Lp; // 👈 배열(Lp[])이 아닌 단일 객체(Lp)
-}>;
+export type CommentAuthor = {
+  id: number;
+  name: string;
+  email: string;
+  bio: string | null;
+  avatar: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Comments = {
+  id: number;
+  content: string;
+  lpId: number;
+  authorId: number;
+  createdAt: string;
+  updatedAt: string;
+  author: CommentAuthor;
+};
+
+export type GetCommentParams = {
+  lpId: number;
+  cursor: number;
+  limit: number;
+  order: "asc" | "desc";
+};
+
+export type ResponseCommentListDto = CursorBasedResponse<Comments[]>;
+
+export type CreateLpDto = {
+  title: string;
+  content: string;
+  thumbnail: string;
+  tags?: string[];
+  published?: boolean;
+};

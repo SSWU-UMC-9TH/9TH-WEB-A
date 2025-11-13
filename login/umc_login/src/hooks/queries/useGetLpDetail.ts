@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { getLpDetail } from "../../apis/lp";
 import { QUERY_KEY } from "../../constants/key";
-import type { Lp, ResponseLpDetailDto } from "../../types/lp";
+import { getLpDetail } from "../../apis/lp";
+import type { RequestLpDto } from "../../types/lp";
 
-function useGetLpDetail(id?: string) {
-  return useQuery<Lp, Error>({
-    queryKey: [QUERY_KEY.lps, id],
-    queryFn: () => getLpDetail(Number(id)),
-    enabled: !!id,
+function useGetLpDetail({ lpId }: RequestLpDto) {
+  return useQuery({
+    queryKey: [QUERY_KEY.lps, lpId],
+    queryFn: () => getLpDetail({ lpId }),
+    select: (res) => res.data,
   });
 }
 

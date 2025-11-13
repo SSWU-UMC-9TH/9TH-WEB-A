@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="bg-[#343A40] text-[#E9ECEF] py-6 mt-auto">
       <div className="container mx-auto text-center text-sm">
         <p>
-          &copy; {new Date().getFullYear()} MOCA MOVIE. All rights reserved.
+          &copy; {new Date().getFullYear()} BAKA MOVIE. All rights reserved.
         </p>
         <div className="flex justify-center space-x-4 mt-2">
           <Link to="#" className="hover:underline">

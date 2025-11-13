@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useRef } from "react";
 
-const ProtectedLayout = () => {
+const ProtectedLayout = ({ children }: { children?: React.ReactNode }) => {
   const { accessToken } = useAuth();
   const navigate = useNavigate();
   const hasChecked = useRef(false);
@@ -17,7 +17,7 @@ const ProtectedLayout = () => {
   }, [accessToken, navigate]);
 
   if (!accessToken) return null;
-
-  return <Outlet />;
+  return <>{children || <Outlet />}</>;
 };
+
 export default ProtectedLayout;
