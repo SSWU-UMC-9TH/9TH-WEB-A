@@ -6,10 +6,13 @@ const LpDetailPage = () => {
   const { id } = useParams();
 
   const { data, isLoading, isError } = useGetLpDetail(id as string);
+  console.log("useGetLpDetail:", { id, data, isLoading, isError });
 
   if (isLoading) return <div className="text-black">불러오는 중...</div>;
-  if (isError || !data)
+  if (isError || !data) {
+    console.error("LP detail error:", isError);
     return <div className="text-black">LP 정보를 불러오지 못했습니다.</div>;
+  }
 
   return (
     <div className="p-8 bg-[#E9ECEF] min-h-screen text-[#212529]">
