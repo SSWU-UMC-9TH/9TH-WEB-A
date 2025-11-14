@@ -1,44 +1,26 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import type { ResponseMyInfoDto } from "../types/auth";
-import { useEffect, useState } from "react";
-import { getMyInfo } from "../apis/auth";
 import { useLogout } from "../hooks/mutations/useLogout";
+import useGetMyInfo from "../hooks/queries/useGetMyInfo";
 
 type NavbarProps = {
   toggleSidebar: () => void;
 }
 
 const Navbar = ({ toggleSidebar }: NavbarProps) => {
-  const { accessToken, logout } = useAuth();
+  const { accessToken } = useAuth();
   const navigate = useNavigate();
-  const [data, setData] = useState<ResponseMyInfoDto>([]);
+  const { data } = useGetMyInfo(accessToken);
    const { mutate: logoutMutation } = useLogout();
-
-  useEffect(() => {
-    if (!accessToken) return;
-
-    const getData = async () => {
-      const response = await getMyInfo();
-      console.log(response);
-  
-      setData(response);
-    };
-  
-    getData();
-  }, [accessToken]);
 
   const handleLogout = async () => {
     try {
-      await logoutMutation(); 
-      setData(null); 
+      await logoutMutation();
       navigate("/");
     } catch (error) {
       console.error("로그아웃 실패:", error);
-      alert("로그아웃 중 문제가 발생했습니다.");
     }
-  }
-
+  };
 
   return (
     <nav className="bg-[#343A40] text-[#E9ECEF] fixed w-full z-10">
@@ -94,7 +76,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
           )}
           {accessToken && (
             <div className="flex justify-between gap-4">
-              <h2>{data.data?.name}님, 반갑습니다</h2>
+              <h2>{data?.data?.name}님, 반갑습니다</h2>
               <button
                 className="hover:underline"
                 onClick={handleLogout}
