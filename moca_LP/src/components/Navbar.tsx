@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import type { ResponseMyInfoDto } from "../types/auth";
 import { useEffect, useState } from "react";
 import { getMyInfo } from "../apis/auth";
+import { useLogout } from "../hooks/mutations/useLogout";
 
 type NavbarProps = {
   toggleSidebar: () => void;
@@ -12,6 +13,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
   const { accessToken, logout } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<ResponseMyInfoDto>([]);
+   const { mutate: logoutMutation } = useLogout();
 
   useEffect(() => {
     if (!accessToken) return;
@@ -27,9 +29,16 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
   }, [accessToken]);
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+    try {
+      await logoutMutation(); 
+      setData(null); 
+      navigate("/");
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+      alert("로그아웃 중 문제가 발생했습니다.");
+    }
   }
+
 
   return (
     <nav className="bg-[#343A40] text-[#E9ECEF] fixed w-full z-10">

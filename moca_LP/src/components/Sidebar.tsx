@@ -5,9 +5,10 @@ import { useEffect } from "react";
 type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
+  onWithdrawClick: () => void;
 };
 
-const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768 && isOpen) {
@@ -29,7 +30,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
       <div
         className={`
-          fixed top-0 left-0 h-full w-64 bg-[#212529] text-white shadow-lg z-20
+          fixed flex flex-col top-0 left-0 h-full w-64 bg-[#212529] text-white shadow-lg z-20
           transform transition-transform duration-300
           ${isOpen ? "translate-x-0 " : "-translate-x-full"}
         `}
@@ -59,6 +60,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             <Search className="w-5 h-5" />
             <span>검색</span>
           </Link>
+        </div>
+        <div className="px-6 mt-auto mb-10">
+          <button
+            onClick={onWithdrawClick}
+            className="text-[#CED4DA] bg-[#495057] px-4 py-2 rounded-xl hover:bg-[#ADB5BD] w-full"
+          >
+            탈퇴하기
+          </button>
         </div>
       </div>
     </>
