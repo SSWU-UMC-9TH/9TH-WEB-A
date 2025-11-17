@@ -5,19 +5,24 @@ import { useEffect } from "react";
 type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
+  onWithdrawClick: () => void;
 };
 
-const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+const navLinks = [
+  { to: "/my", icon: <User className="w-5 h-5" />, label: "마이페이지" },
+  { to: "/search", icon: <Search className="w-5 h-5" />, label: "검색" },
+];
+
+const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768 && isOpen) {
+      if (window.innerWidth < 768) {
         onClose();
       }
     };
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isOpen, onClose]);
+  }, [onClose]);
 
   return (
     <>
@@ -28,41 +33,50 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
+        aria-hidden={!isOpen}
       />
 
-      <div
-        className={`
-          fixed top-0 left-0 h-full w-64 bg-[#FF1493] text-white shadow-lg z-20
-          transform transition-transform duration-300
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
+      <aside
+        className={`fixed top-0 left-0 h-full w-64 bg-[#FF1493] text-white shadow-lg z-20 transform transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        aria-hidden={!isOpen}
       >
         <div className="flex justify-end p-4">
-          <button onClick={onClose}>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Sidebar"
+            className="focus:outline-none focus:ring-2 focus:ring-white rounded"
+          >
             <X className="w-6 h-6 text-white" />
           </button>
         </div>
 
-        <div className="flex flex-col items-start gap-4 px-6 mt-4">
-          <Link
-            to="/my"
-            className="flex items-center gap-2 w-full hover:underline"
-            onClick={onClose}
-          >
-            <User className="w-5 h-5" />
-            <span>마이페이지</span>
-          </Link>
+        <nav className="flex flex-col items-start gap-4 px-6 mt-4">
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className="flex items-center gap-2 w-full hover:underline focus:outline-none focus:ring-2 focus:ring-white rounded"
+              onClick={onClose}
+            >
+              {link.icon}
+              <span>{link.label}</span>
+            </Link>
+          ))}
+        </nav>
 
-          <Link
-            to="/search"
-            className="flex items-center gap-2 w-full hover:underline"
-            onClick={onClose}
+        <div className="px-6 mt-auto mb-10">
+          <button
+            type="button"
+            onClick={onWithdrawClick}
+            className="w-full px-4 py-2 rounded-xl text-[#CED4DA] bg-[#495057] hover:bg-[#ADB5BD] focus:outline-none focus:ring-2 focus:ring-white transition"
           >
-            <Search className="w-5 h-5" />
-            <span>검색</span>
-          </Link>
+            탈퇴하기
+          </button>
         </div>
-      </div>
+      </aside>
     </>
   );
 };

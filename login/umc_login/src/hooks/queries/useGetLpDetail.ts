@@ -7,7 +7,6 @@ function useGetLpDetail({ lpId }: RequestLpDto) {
   return useQuery({
     queryKey: [QUERY_KEY.lps, lpId],
     queryFn: () => getLpDetail({ lpId }),
-    select: (res) => res.data,
   });
 }
 
