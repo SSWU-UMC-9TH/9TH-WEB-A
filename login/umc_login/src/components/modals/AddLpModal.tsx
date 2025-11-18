@@ -16,19 +16,22 @@ export const AddLpModal = ({ onClose }: LpModalProps) => {
   const [tags, setTags] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  const uploadLp = async () => {
+    if (!imageFile) throw new Error("썸네일 이미지를 선택해주세요.");
+    const imageUrl = await uploadImageToServer(imageFile);
+    const lpData: CreateLpDto = {
+      title,
+      content,
+      thumbnail: imageUrl,
+      tags,
+      published: true,
+    };
+
+    return postLp(lpData);
+  };
+
   const { mutate, isLoading } = useMutation({
-    mutationFn: async () => {
-      if (!imageFile) throw new Error("썸네일 이미지를 선택해주세요.");
-      const imageUrl = await uploadImageToServer(imageFile);
-      const lpData: CreateLpDto = {
-        title,
-        content,
-        thumbnail: imageUrl,
-        tags,
-        published: true,
-      };
-      await postLp(lpData);
-    },
+    mutationFn: uploadLp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lps"] });
       onClose();

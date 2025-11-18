@@ -1,54 +1,65 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postLike } from "../../apis/lp";
-import { queryClient } from "../../App";
 import { QUERY_KEY } from "../../constants/key";
 import type { Likes, RequestLpDto, ResponseLpDto } from "../../types/lp";
 import type { ResponseMyInfoDto } from "../../types/auth";
 
 function usePostLike() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: postLike,
     onMutate: async (lp: RequestLpDto) => {
-      await queryClient.cancelQueries({
-        queryKey: [QUERY_KEY.lps, lp.lpId],
-      });
+      const queryKey = [QUERY_KEY.lps, lp.lpId];
+      await queryClient.cancelQueries({ queryKey });
 
-      const previousLpPost: ResponseLpDto | undefined =
-        queryClient.getQueryData<ResponseLpDto>([QUERY_KEY.lps, lp.lpId]);
+      const previousLpPost = queryClient.getQueryData<ResponseLpDto>(queryKey);
 
-      const newLpPost = { ...previousLpPost };
-      const me: ResponseMyInfoDto | undefined =
-        queryClient.getQueryData<ResponseMyInfoDto>([QUERY_KEY.myInfo]);
+      const me = queryClient.getQueryData<ResponseMyInfoDto>([
+        QUERY_KEY.myInfo,
+      ]);
       const userId = Number(me?.data.id);
 
-      const likedIndex =
-        previousLpPost?.data.likes.findIndex(
-          (like: Likes) => like.userId === userId
-        ) ?? -1;
-
-      if (likedIndex >= 0) {
-        previousLpPost?.data.likes.splice(likedIndex, 1);
-      } else {
-        const newLike: Likes = { userId, lpId: lp.lpId } as Likes;
-        previousLpPost?.data.likes.push(newLike);
+      if (!previousLpPost || !userId) {
+        return { previousLpPost };
       }
 
-      console.log(newLpPost);
+      const isAlreadyLiked = previousLpPost.data.likes.some(
+        (like: Likes) => like.userId === userId
+      );
 
-      queryClient.setQueryData([QUERY_KEY.lps, lp.lpId], newLpPost);
+      if (isAlreadyLiked) {
+        console.warn("Optimistic update skipped: Already liked.");
+        return { previousLpPost };
+      }
 
-      return { previousLpPost, newLpPost };
+      const newLike: Likes = { userId, lpId: lp.lpId } as Likes;
+
+      queryClient.setQueryData<ResponseLpDto>(queryKey, (oldData) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            likes: [...oldData.data.likes, newLike],
+          },
+        };
+      });
+
+      return { previousLpPost };
     },
 
     onError: (err: Error, newLp: RequestLpDto, context) => {
-      console.log(err, newLp);
-      queryClient.setQueryData(
-        [QUERY_KEY.lps, newLp.lpId],
-        context?.previousLpPost?.data.id
-      );
+      console.error("좋아요 추가 실패:", err, newLp);
+      if (context?.previousLpPost) {
+        queryClient.setQueryData(
+          [QUERY_KEY.lps, newLp.lpId],
+          context.previousLpPost
+        );
+      }
     },
 
-    onSettled: async (data, error, Variables, context) => {
+    onSettled: async (data, error, Variables) => {
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEY.lps, Variables.lpId],
       });
