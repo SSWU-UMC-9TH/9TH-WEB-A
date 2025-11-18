@@ -10,7 +10,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import LpDetailPage from "./pages/LpDetailPage";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const publicRoutes = [
   {
