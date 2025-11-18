@@ -19,7 +19,7 @@ const publicRoutes = [
     errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "lp/:id", element: <LpDetailPage /> },
+      { path: "lp/:lpid", element: <LpDetailPage /> },
     ],
   },
   {

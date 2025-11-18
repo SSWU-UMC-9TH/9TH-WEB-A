@@ -1,75 +1,73 @@
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getLpDetail } from "@/apis/lp";
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useLpDetail } from '../hooks/useLpDetail'; 
 
-export default function LpDetailPage() {
-  const { id } = useParams<{ id: string }>();
+const LpDetailPage: React.FC = () => {
+  const { lpid } = useParams<{ lpid: string }>();
 
-  const {
-    data: lp,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["lp", id],
-    queryFn: () => getLpDetail(Number(id)),
-    enabled: !!id,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-  });
+  const { 
+    data: lpData, 
+    isLoading, 
+    isError, 
+    error 
+  } = useLpDetail(lpid);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full text-gray-400">
-        로딩 중...
-      </div>
-    );
+    return <div style={{ padding: '20px', textAlign: 'center' }}>로딩 중...</div>; 
   }
 
-  if (isError || !lp) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-red-400">
-        <p>LP 정보를 불러오는 중 오류가 발생했습니다.</p>
-        <button
-          onClick={() => refetch()}
-          className="mt-2 px-3 py-1 bg-pink-500 rounded"
-        >
-          다시 시도
-        </button>
-      </div>
-    );
+  if (isError) {
+    return <div style={{ padding: '20px', color: 'red', textAlign: 'center' }}>에러 발생: {error.message}</div>;
   }
 
+  if (!lpData) {
+    return <div style={{ padding: '20px', textAlign: 'center' }}>LP 정보를 불러오지 못했습니다.</div>;
+  }
+  
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <img
-        src={lp.thumbnail || "https://via.placeholder.com/800?text=No+Image"}
-        alt={lp.title}
-        className="w-full h-72 object-cover rounded-lg shadow-lg"
-      />
+    <div className="lp-detail-page-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+      
+      <section className="lp-header-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ color: '#888', fontSize: '0.9em' }}>{lpData.createdAt?.substring(0, 10) || '1일 전'}</span> 
+        </div>
 
-      <div>
-        <h1 className="text-3xl font-bold text-white">{lp.title}</h1>
-        <p className="text-gray-400 mt-1">
-          업로드일: {new Date(lp.createdAt).toLocaleDateString()}
-        </p>
-      </div>
+        <div className="lp-edit-actions">
+          <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2em' }} title="수정">✏️</button>
+          <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2em', marginLeft: '10px' }} title="삭제">🗑️</button>
+        </div>
+      </section>
 
-      <div className="flex gap-4">
-        <button className="bg-pink-500 px-4 py-2 rounded-md hover:bg-pink-600">
-          ❤️ 좋아요
-        </button>
-        <button className="bg-zinc-700 px-4 py-2 rounded-md hover:bg-zinc-600">
-          수정
-        </button>
-        <button className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-700">
-          삭제
-        </button>
-      </div>
+      <section className="lp-title-section" style={{ marginBottom: '25px' }}>
+        <h1 className="lp-title" style={{ fontSize: '2em', margin: '0' }}>{lpData.title}</h1>
+      </section>
+      
+            <section className="lp-image-section" style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+        {lpData.thumbnail && (
+          <div className="lp-image-wrapper" style={{ 
+            width: '300px', 
+            height: '300px', 
+            overflow: 'hidden',
+          }}>
+            <img src={lpData.thumbnail} alt={lpData.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        )}
+      </section>
 
-      <article className="bg-zinc-900 text-gray-200 p-6 rounded-lg leading-relaxed whitespace-pre-wrap">
-        {lp.content || "본문 내용이 없습니다."}
-      </article>
+      <section className="lp-content-section" style={{ marginBottom: '30px', borderTop: '1px solid #333', paddingTop: '20px' }}>
+        <div className="lp-body" style={{ fontSize: '1em', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+          <p className="lp-body-text">{lpData.content}</p>
+        </div>
+      </section>
+
+      <section className="lp-actions-footer" style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <button className="btn-like" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5em', color: 'pink' }}>
+          ❤️ {lpData.likeCount ?? 0}
+        </button>
+      </section>
+
     </div>
   );
-}
+};
+
+export default LpDetailPage;

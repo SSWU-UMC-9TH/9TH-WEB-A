@@ -19,7 +19,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         {isLoggedIn ? (
           <>
-            <span>반갑습니다 :)</span>
+            {<span>도라님 반갑습니다.</span>}
             <button
               onClick={logout}
               className="border border-gray-600 px-3 py-1 rounded-md hover:bg-gray-800"

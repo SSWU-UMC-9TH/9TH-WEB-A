@@ -26,20 +26,19 @@ const schema = z
 
 type FormFields = z.infer<typeof schema>;
 
-// Mocked imports to resolve build error. Replace with your actual files.
 const postSignup = async (data: Omit<FormFields, "passwordCheck">) => {
   console.log("Mock signup:", data);
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   return { success: true, message: "Signup successful" };
 };
-type ResponseSignupDto = { success: boolean; message: string; [key: string]: any; };
 
+type ResponseSignupDto = { success: boolean; message: string; [key: string]: any };
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordCheck, setShowPasswordCheck] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -57,7 +56,6 @@ const SignupPage = () => {
   });
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordCheck, ...rest } = data;
     try {
       const response: ResponseSignupDto = await postSignup(rest);
@@ -75,7 +73,7 @@ const SignupPage = () => {
     Object.keys(errors).length > 0;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white relative">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-900 relative">
       <button
         onClick={() => navigate(-1)}
         className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 transition"
@@ -88,72 +86,64 @@ const SignupPage = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="w-full flex flex-col items-center gap-5"
         >
-          <h1 className="text-2xl font-bold mb-2">회원가입</h1>
+          <h1 className="text-pink-500 text-2xl font-bold mb-2">회원가입</h1>
 
           <div className="w-full flex flex-col gap-3">
+
+            {/* EMAIL */}
             <div>
               <input
                 {...register("email")}
-                className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-                  errors.email
-                    ? "border-red-500 bg-red-100 focus:ring-red-300"
-                    : "border-gray-300 focus:ring-blue-300"
-                }`}
+                className={`text-white border w-full p-[12px] rounded-md placeholder-gray-400 
+                focus:outline-none focus:ring-0 
+                ${errors.email ? "border-red-500" : "border-zinc-500"}`}
                 type="email"
                 placeholder="이메일"
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
               )}
             </div>
 
+            {/* PASSWORD */}
             <div>
               <div className="relative">
                 <input
                   {...register("password")}
-                  className={`border w-full p-[12px] pr-10 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-                    errors.password
-                      ? "border-red-500 bg-red-100 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-blue-300"
-                  }`}
+                  className={`text-white border w-full p-[12px] pr-10 rounded-md placeholder-gray-400 
+                  focus:outline-none focus:ring-0 
+                  ${errors.password ? "border-red-500" : "border-zinc-500"}`}
                   type={showPassword ? "text" : "password"}
                   placeholder="비밀번호"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
               )}
             </div>
 
+            {/* PASSWORD CHECK */}
             <div>
               <div className="relative">
                 <input
                   {...register("passwordCheck")}
-                  className={`border w-full p-[12px] pr-10 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-                    errors.passwordCheck
-                      ? "border-red-500 bg-red-100 focus:ring-red-300"
-                      : "border-gray-300 focus:ring-blue-300"
-                  }`}
+                  className={`text-white border w-full p-[12px] pr-10 rounded-md placeholder-gray-400 
+                  focus:outline-none focus:ring-0 
+                  ${errors.passwordCheck ? "border-red-500" : "border-zinc-500"}`}
                   type={showPasswordCheck ? "text" : "password"}
                   placeholder="비밀번호 확인"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPasswordCheck((prev) => !prev)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label={showPasswordCheck ? "비밀번호 확인 숨기기" : "비밀번호 확인 보기"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 >
                   {showPasswordCheck ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -165,32 +155,27 @@ const SignupPage = () => {
               )}
             </div>
 
+            {/* NAME */}
             <div>
               <input
                 {...register("name")}
-                className={`border w-full p-[12px] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 ${
-                  errors.name
-                    ? "border-red-500 bg-red-100 focus:ring-red-300"
-                    : "border-gray-300 focus:ring-blue-300"
-                }`}
+                className={`text-white border w-full p-[12px] rounded-md placeholder-gray-400 
+                focus:outline-none focus:ring-0 
+                ${errors.name ? "border-red-500" : "border-zinc-500"}`}
                 type="text"
                 placeholder="이름"
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.name.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
               )}
             </div>
 
+            {/* BUTTON */}
             <button
               disabled={isDisabled}
               type="submit"
-              className={`w-full py-3 rounded-md text-lg font-medium transition-colors ${
-                isDisabled
-                  ? "bg-gray-300 cursor-not-allowed text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              }`}
+              className={`w-full py-3 rounded-md text-lg font-medium transition-colors 
+              ${isDisabled ? "bg-gray-300 cursor-not-allowed text-white" : "bg-pink-500 hover:bg-pink-600 text-white"}`}
             >
               {isSubmitting ? "가입 중..." : "회원가입"}
             </button>
