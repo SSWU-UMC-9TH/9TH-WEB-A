@@ -3,10 +3,11 @@ import { validateSignin, type UserSigninInformation } from "../utils/validate";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
+import { useLoginMutation } from "../hooks/mutations/useLogin";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, accessToken } = useAuth();
+  const { accessToken } = useAuth();
   const { values, errors, touched, getInputProps } = useForm<UserSigninInformation>({
     initialValue: {
       email: "",
@@ -21,13 +22,10 @@ const LoginPage = () => {
     }
   }, [accessToken, navigate]);
 
+  const { mutate: loginMutate, isPending } = useLoginMutation();
+  
   const handleSubmit = async () => {
-    try {
-      await login(values);
-      navigate("/");
-    } catch (error) {
-      // intentionally empty
-    }
+    loginMutate(values);
   };
 
   const handleGoogleLogin = () => {
