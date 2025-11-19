@@ -10,7 +10,8 @@ import { SEARCH_DELAY } from "../constants/delay";
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.asc);
-  const debouncedValue = useDebounce(search, SEARCH_DELAY)
+  const debouncedValue = useDebounce(search, SEARCH_DELAY);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const {
     data: lps,
@@ -20,7 +21,9 @@ const HomePage = () => {
     fetchNextPage,
     isError,
     refetch
-  } = useGetInfiniteLpList(10, debouncedValue, order);
+  } = useGetInfiniteLpList(10, debouncedValue, order, {
+    enabled: !(isSearchFocused && debouncedValue.trim().length === 0),
+  });
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -54,6 +57,8 @@ const HomePage = () => {
       <div className="flex justify-end mb-4 space-x-2">
         <input
           className="bg-[#6C757D] rounded-md p-2 placeholder-[#CED4DA] text-[#F8F9FA]"
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="검색어를 입력하세요"
@@ -86,7 +91,7 @@ const HomePage = () => {
           ?.flat()
           ?.map((lp) =>
             <LpCard key={lp.id} lp={lp} />
-        )}
+          )}
         {!isFetching && <LpCardSkeletonList count={20} />}
       </div>
       <div ref={ref} className="h-2" />

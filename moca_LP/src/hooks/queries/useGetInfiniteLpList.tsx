@@ -4,10 +4,13 @@ import { getLpList } from "../../apis/lp";
 import { QUERY_KEY } from "../../constants/key";
 
 function useGetInfiniteLpList(
-    limit: number,
-    search: string,
-    order: PAGINATION_ORDER
+  limit: number,
+  search: string,
+  order: PAGINATION_ORDER,
+  options?: { enabled?: boolean }
 ) {
+  const isSearch = search.trim().length > 0;
+
   return useInfiniteQuery({
     queryFn: ({ pageParam }) =>
       getLpList({ cursor: pageParam, limit, search, order }),
@@ -16,7 +19,9 @@ function useGetInfiniteLpList(
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.data.hasNext ? lastPage.data.nextCursor : undefined;
     },
+    staleTime: isSearch ? 30 * 1000 : 5 * 60 * 1000,
+    enabled: options?.enabled ?? true,
   });
-};
+}
 
 export default useGetInfiniteLpList;
