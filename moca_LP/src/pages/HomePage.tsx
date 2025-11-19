@@ -14,22 +14,7 @@ const HomePage = () => {
   const debouncedValue = useDebounce(search, SEARCH_DELAY);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-
   const throttledScrollY = useThrottle(scrollY, 200);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    console.log("🔥 실제 처리되는 스크롤 값:", throttledScrollY);
-  }, [throttledScrollY]);
 
   const {
     data: lps,
@@ -39,17 +24,39 @@ const HomePage = () => {
     fetchNextPage,
     isError,
     refetch
-  } = useGetInfiniteLpList(10, debouncedValue, order, );
+  } = useGetInfiniteLpList(10, debouncedValue, order, {
+    enabled: debouncedValue.trim().length > 0 || !isSearchFocused
+  });
 
   const { ref, inView } = useInView({
     threshold: 0,
   })
 
   useEffect(() => {
-    if (inView) {
-      !isFetching && hasNextPage && fetchNextPage();
+    if (
+      inView &&
+      hasNextPage &&
+      throttledScrollY + window.innerHeight >= document.body.scrollHeight - 300
+    ) {
+      fetchNextPage();
     }
-  }, [inView, isFetching, hasNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, throttledScrollY, fetchNextPage]);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 무한 스크롤 방지
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  }, []);
 
   if (isError) {
     return (
