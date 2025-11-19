@@ -6,9 +6,10 @@ import Sidebar from "../components/Sidebar";
 import { LpAddButton } from "../components/buttons/AddLpButton";
 import { deleteUser } from "../apis/auth";
 import WithdrawalModal from "../components/modals/WithdrawalModal";
+import useSidebar from "../hooks/useSidebar";
 
 const HomeLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isOpen: sidebarOpen, open: openSidebar, close: closeSidebar, toggle: toggleSidebar } = useSidebar();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleWithdraw = async () => {
@@ -21,9 +22,6 @@ const HomeLayout = () => {
       alert("탈퇴 중 문제가 발생했습니다.");
     }
   };
-
-  const toggleSidebar = () => setSidebarOpen(prev => !prev);
-  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <div className="h-dvh flex flex-col bg-[#fff] text-[#000]">
