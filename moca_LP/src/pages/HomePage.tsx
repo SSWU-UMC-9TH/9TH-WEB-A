@@ -4,10 +4,13 @@ import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { useInView } from "react-intersection-observer"
 import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
+import useDebounce from "../hooks/useDebounce";
+import { SEARCH_DELAY } from "../constants/delay";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.asc);
+  const debouncedValue = useDebounce(search, SEARCH_DELAY)
 
   const {
     data: lps,
@@ -17,7 +20,7 @@ const HomePage = () => {
     fetchNextPage,
     isError,
     refetch
-  } = useGetInfiniteLpList(10, search, order);
+  } = useGetInfiniteLpList(10, debouncedValue, order);
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -49,6 +52,12 @@ const HomePage = () => {
     <div className="p-8 bg-[#F8F9FA] min-h-screen">
       {/* 정렬 버튼 */}
       <div className="flex justify-end mb-4 space-x-2">
+        <input
+          className="bg-[#6C757D] rounded-md p-2 placeholder-[#CED4DA] text-[#F8F9FA]"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="검색어를 입력하세요"
+        />
         <button
           className={`px-4 py-2 rounded-md font-medium transition-all duration-200 border ${order === "asc"
             ? "bg-[#212529] text-[#E9ECEF] border-[#212529] shadow-sm"
