@@ -6,12 +6,30 @@ import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import useDebounce from "../hooks/useDebounce";
 import { SEARCH_DELAY } from "../constants/delay";
+import useThrottle from "../hooks/useThrottle";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.asc);
   const debouncedValue = useDebounce(search, SEARCH_DELAY);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  const throttledScrollY = useThrottle(scrollY, 200);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    console.log("🔥 실제 처리되는 스크롤 값:", throttledScrollY);
+  }, [throttledScrollY]);
 
   const {
     data: lps,
@@ -21,9 +39,7 @@ const HomePage = () => {
     fetchNextPage,
     isError,
     refetch
-  } = useGetInfiniteLpList(10, debouncedValue, order, {
-    enabled: !(isSearchFocused && debouncedValue.trim().length === 0),
-  });
+  } = useGetInfiniteLpList(10, debouncedValue, order, );
 
   const { ref, inView } = useInView({
     threshold: 0,
