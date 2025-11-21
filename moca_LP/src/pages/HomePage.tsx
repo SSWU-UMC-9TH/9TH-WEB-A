@@ -28,19 +28,18 @@ const HomePage = () => {
     enabled: debouncedValue.trim().length > 0 || !isSearchFocused
   });
 
-  const { ref, inView } = useInView({
+  const { ref } = useInView({
     threshold: 0,
   })
 
   useEffect(() => {
     if (
-      inView &&
       hasNextPage &&
       throttledScrollY + window.innerHeight >= document.body.scrollHeight - 300
     ) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, throttledScrollY, fetchNextPage]);
+  }, [throttledScrollY, hasNextPage, fetchNextPage]);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -117,7 +116,8 @@ const HomePage = () => {
           )}
         {!isFetching && <LpCardSkeletonList count={20} />}
       </div>
-      <div ref={ref} className="h-2" />
+      {!isFetching && <div ref={ref} className="h-10" />}
+      {isFetching && <LpCardSkeletonList count={10} />}
     </div>
   );
 };
