@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { X, Search, User } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -14,20 +14,32 @@ const navLinks = [
 ];
 
 const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
+  const handleResize = useCallback(() => {
+    if (window.innerWidth < 768 && isOpen) onClose();
+  }, [isOpen, onClose]);
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => e.key === "Escape" && isOpen && onClose(),
+    [isOpen, onClose]
+  );
+
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        onClose();
-      }
-    };
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [onClose]);
+    window.addEventListener("keydown", handleKeyDown);
+
+    document.body.style.overflow = isOpen ? "hidden" : "";
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [handleResize, handleKeyDown, isOpen]);
 
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black/50 z-10 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-10 bg-black/50 transition-opacity duration-300 ${
           isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -37,7 +49,7 @@ const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
       />
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-[#FF1493] text-white shadow-lg z-20 transform transition-transform duration-300 ${
+        className={`fixed top-0 left-0 z-20 h-full w-64 transform bg-[#FF1493] text-white shadow-lg transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-hidden={!isOpen}
@@ -53,16 +65,16 @@ const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
           </button>
         </div>
 
-        <nav className="flex flex-col items-start gap-4 px-6 mt-4">
-          {navLinks.map((link) => (
+        <nav className="flex flex-col gap-4 px-6 mt-4">
+          {navLinks.map(({ to, icon, label }) => (
             <Link
-              key={link.to}
-              to={link.to}
-              className="flex items-center gap-2 w-full hover:underline focus:outline-none focus:ring-2 focus:ring-white rounded"
+              key={to}
+              to={to}
               onClick={onClose}
+              className="flex w-full items-center gap-2 rounded hover:underline focus:outline-none focus:ring-2 focus:ring-white"
             >
-              {link.icon}
-              <span>{link.label}</span>
+              {icon}
+              <span>{label}</span>
             </Link>
           ))}
         </nav>
@@ -71,7 +83,7 @@ const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
           <button
             type="button"
             onClick={onWithdrawClick}
-            className="w-full px-4 py-2 rounded-xl text-[#CED4DA] bg-[#495057] hover:bg-[#ADB5BD] focus:outline-none focus:ring-2 focus:ring-white transition"
+            className="w-full rounded-xl bg-[#495057] px-4 py-2 text-[#CED4DA] transition hover:bg-[#ADB5BD] focus:outline-none focus:ring-2 focus:ring-white"
           >
             탈퇴하기
           </button>

@@ -10,9 +10,16 @@ import { LpAddButton } from "../components/buttons/AddLpButton";
 
 import { deleteUser } from "../apis/auth";
 import { useAuth } from "../context/AuthContext";
+import useSidebar from "../hooks/useSidebar"; // 추가
 
 const HomeLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const {
+    isOpen: sidebarOpen,
+    open: openSidebar,
+    close: closeSidebar,
+    toggle: toggleSidebar,
+  } = useSidebar(); // 추가
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -36,9 +43,6 @@ const HomeLayout = () => {
   const handleWithdrawConfirm = () => {
     withdrawMutate();
   };
-
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <div className="h-dvh flex flex-col bg-[#fff] text-[#000]">
