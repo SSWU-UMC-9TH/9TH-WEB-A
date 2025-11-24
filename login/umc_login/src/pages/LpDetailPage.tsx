@@ -20,11 +20,14 @@ import useUpdateLp from "../hooks/mutations/useUpdateLp";
 import useDeleteLp from "../hooks/mutations/useDeleteLp";
 import { ThumbnailInput } from "../components/ThumbnailInputProps";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 const LpDetailPage = () => {
   const { lpId } = useParams();
   const lpIdNumber = Number(lpId);
   const { accessToken } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: lp, isPending, isError } = useGetLpDetail({ lpId: lpIdNumber });
   const { data: me } = useGetMyInfo(accessToken!);
@@ -43,8 +46,7 @@ const LpDetailPage = () => {
   const { mutate: disLikeMutate } = useDeleteLike();
   const { mutate: postCommentMutate, isPending: isPosting } = usePostComment();
   const updateLpMutate = useUpdateLp();
-  const { mutate: deleteLpMutate, isPending: isDeleting } =
-    useDeleteLp(navigate);
+  const { mutate: deleteLpMutate } = useDeleteLp(navigate);
 
   const {
     data: commentsData,
@@ -93,15 +95,28 @@ const LpDetailPage = () => {
   };
 
   const handleUpdateLp = () => {
-    updateLpMutate.mutate({
-      lpId: lpIdNumber,
-      patchData: {
-        title: editedTitle,
-        content: editedContent,
-        thumbnail: editedThumbnail,
+    updateLpMutate.mutate(
+      {
+        lpId: lpIdNumber,
+        patchData: {
+          title: editedTitle,
+          content: editedContent,
+          thumbnail: editedThumbnail,
+        },
       },
-    });
-    setIsEditing(false);
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["lpDetail", lpIdNumber],
+          });
+
+          setIsEditing(false);
+        },
+        onError: () => {
+          alert("LP 수정에 실패했습니다.");
+        },
+      }
+    );
   };
 
   const handleDeleteLp = () => {

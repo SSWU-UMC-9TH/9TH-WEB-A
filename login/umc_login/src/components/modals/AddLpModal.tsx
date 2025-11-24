@@ -54,10 +54,10 @@ export const AddLpModal = ({ onClose }: LpModalProps) => {
   };
 
   const handleSubmit = () => {
-    if (!title.trim() || !content.trim()) {
-      alert("제목과 내용을 입력해주세요.");
-      return;
-    }
+    if (!title.trim()) return alert("제목을 입력해주세요.");
+    if (!content.trim()) return alert("내용을 입력해주세요.");
+    if (!imageFile) return alert("이미지를 업로드해주세요.");
+
     mutate();
   };
 
