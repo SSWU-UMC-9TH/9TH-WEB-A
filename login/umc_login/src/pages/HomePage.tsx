@@ -6,11 +6,15 @@ import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import useDebounce from "../hooks/useDebounce";
 import { SEARCH_DELAY } from "../constants/delay";
+import useThrottle from "../hooks/useThrottle";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const [scrollY, setScrollY] = useState(0);
+  const throttledScrollY = useThrottle(scrollY, 200);
 
   const debouncedValue = useDebounce(search, SEARCH_DELAY);
 
@@ -23,7 +27,7 @@ const HomePage = () => {
     isFetchingNextPage,
     refetch,
   } = useGetInfiniteLpList(10, debouncedValue, order, {
-    enabled: !(isSearchFocused && debouncedValue.trim().length === 0),
+    enabled: debouncedValue.trim().length > 0 || !isSearchFocused,
   });
 
   const { ref, inView } = useInView({
@@ -31,10 +35,29 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    if (inView) {
-      !isFetching && hasNextPage && fetchNextPage();
+    if (
+      inView &&
+      hasNextPage &&
+      throttledScrollY + window.innerHeight >= document.body.scrollHeight - 300
+    ) {
+      fetchNextPage();
     }
-  }, [inView, isFetching, hasNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, throttledScrollY, fetchNextPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  }, []);
 
   if (isError) {
     return (
