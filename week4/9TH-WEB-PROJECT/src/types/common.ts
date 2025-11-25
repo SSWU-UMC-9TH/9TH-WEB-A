@@ -4,3 +4,10 @@ export type CommonResponse<T> = {
   message: string;
   data: T;
 };
+
+export const PAGINATION_ORDER_VALUE = { 
+  asc: 'asc',
+  desc: 'desc',
+} as const;
+
+export type PAGINATION_ORDER = typeof PAGINATION_ORDER_VALUE[keyof typeof PAGINATION_ORDER_VALUE];

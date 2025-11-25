@@ -1,9 +1,14 @@
 import LpCardSkeleton from "@/components/LpCardSkeleton";
+import React from 'react';
 
-const LpCardSkeletonList = () => {
+interface LpCardSkeletonListProps {
+  count?: number; 
+}
+
+const LpCardSkeletonList: React.FC<LpCardSkeletonListProps> = ({ count = 10 }) => {
   return (
     <div className="grid grid-cols-5 gap-4">
-      {Array.from({ length: 20 }).map((_, idx) => (
+      {Array.from({ length: count }).map((_, idx) => (
         <LpCardSkeleton key={idx} />
       ))}
     </div>

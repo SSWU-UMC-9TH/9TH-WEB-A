@@ -1,17 +1,30 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
-export default function Header() {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+
+export default function Header({ toggleSidebar }: HeaderProps) {
   const { accessToken, logout } = useAuth();
   const navigate = useNavigate();
 
   const isLoggedIn = Boolean(accessToken);
 
   return (
-    <header className="flex justify-between items-center px-6 py-4 bg-zinc-900 border-b border-zinc-800 text-white">
+    <header className="flex justify-between items-center px-6 py-4 bg-zinc-900 border-b border-zinc-800 text-white relative">
+      
+      <button 
+          className="text-white text-2xl p-2 z-50 hover:text-pink-500 transition duration-150 md:hidden absolute left-2"
+          onClick={toggleSidebar}
+          aria-label="Toggle Menu"
+      >
+          ☰
+      </button>
+
       <h1
         onClick={() => navigate("/")}
-        className="text-pink-500 font-bold text-xl cursor-pointer"
+        className="text-pink-500 font-bold text-xl cursor-pointer ml-10 md:ml-0" 
       >
         DOLIGO
       </h1>
