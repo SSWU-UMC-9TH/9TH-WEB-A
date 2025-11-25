@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const getLpList = async (params: {
-  cursor?: number;
+  cursor: string | undefined;
   limit?: number;
   search?: string;
   order?: "asc" | "desc";
