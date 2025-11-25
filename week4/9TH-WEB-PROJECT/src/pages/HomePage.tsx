@@ -6,6 +6,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { PAGINATION_ORDER_VALUE } from "../types/common";
 import { SEARCH_DELAY } from "../constants/delay";
 import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList"; 
+import useThrottle from "../hooks/useThrottle";
 import type { PAGINATION_ORDER as OrderType } from "../types/common"; 
 
 
@@ -16,6 +17,8 @@ export default function HomePage() {
   const [order, setOrder] = useState<OrderType>(PAGINATION_ORDER_VALUE.desc); 
 
   const { ref, inView } = useInView({ threshold: 0 });
+  
+  const throttledInView = useThrottle(inView, 1000); 
 
   const {
     data: lpsPages,
@@ -32,10 +35,10 @@ export default function HomePage() {
   const lps = lpsPages?.pages.flatMap(page => page.data.data.items) ?? [];
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
+    if (throttledInView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [throttledInView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="flex flex-col gap-6">
