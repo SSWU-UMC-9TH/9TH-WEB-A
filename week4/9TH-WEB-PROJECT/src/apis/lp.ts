@@ -29,16 +29,31 @@ export interface Lp {
   content?: string;
 }
 
+export const postLike = async (lpId: number) => {
+  const { data } = await axios.post(
+    `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${lpId}/like`
+  );
+  return data;
+};
+
 export const deleteLike = async (lpid: number) => {
-    const { data } = await axios.delete(
-        `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${lpid}/like`
-    );
-    return data;
+  const { data } = await axios.delete(
+    `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${lpid}/like`
+  );
+  return data;
 };
 
 export const deleteLp = async (lpId: number | string) => {
   const { data } = await axios.delete(
     `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${lpId}`
+  );
+  return data;
+};
+
+export const patchLp = async (lpId: number, patchData: any) => {
+  const { data } = await axios.patch(
+    `${import.meta.env.VITE_SERVER_API_URL}/v1/lps/${lpId}`,
+    patchData
   );
   return data;
 };
