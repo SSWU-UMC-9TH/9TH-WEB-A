@@ -10,7 +10,7 @@ import { LpAddButton } from "../components/buttons/AddLpButton";
 
 import { deleteUser } from "../apis/auth";
 import { useAuth } from "../context/AuthContext";
-import useSidebar from "../hooks/useSidebar"; // 추가
+import useSidebar from "../hooks/useSidebar";
 
 const HomeLayout = () => {
   const {
@@ -18,7 +18,7 @@ const HomeLayout = () => {
     open: openSidebar,
     close: closeSidebar,
     toggle: toggleSidebar,
-  } = useSidebar(); // 추가
+  } = useSidebar();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -28,7 +28,7 @@ const HomeLayout = () => {
   const { mutate: withdrawMutate, isPending } = useMutation({
     mutationFn: deleteUser,
     onSuccess: () => {
-      alert("탈퇴되었습니다. 이용해 주셔서 감사합니다.");
+      alert("탈퇴되었습니다.");
       logout();
       navigate("/");
       setIsModalOpen(false);
