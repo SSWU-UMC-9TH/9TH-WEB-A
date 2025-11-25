@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { X, Search, User } from "lucide-react";
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -14,16 +14,19 @@ const navLinks = [
 ];
 
 const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
-  const handleResize = useCallback(() => {
-    if (window.innerWidth < 768 && isOpen) onClose();
-  }, [isOpen, onClose]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => e.key === "Escape" && isOpen && onClose(),
-    [isOpen, onClose]
-  );
-
   useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768 && isOpen) {
+        onClose();
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
     window.addEventListener("resize", handleResize);
     window.addEventListener("keydown", handleKeyDown);
 
@@ -34,7 +37,7 @@ const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [handleResize, handleKeyDown, isOpen]);
+  }, [isOpen, onClose]);
 
   return (
     <>
