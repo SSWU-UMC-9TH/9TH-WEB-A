@@ -4,6 +4,7 @@ import CartList from './components/CartList'
 import Navbar from './components/Navbar'
 import store from './store/store'
 import PriceBox from './components/PriceBox'
+import CartClearModal from './components/modal/CartClearModal'
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Navbar />
       <CartList />
       <PriceBox />
+      <CartClearModal />
     </Provider>
   )
 }
