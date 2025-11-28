@@ -1,15 +1,11 @@
-import { useDispatch, useSelector } from "../../hooks/useCustomRedux";
-import { clearCart } from "../../slices/cart/cartSlice";
-import { closeModal } from "../../slices/modal/modalSlice";
+import { useCartActions } from "../../hooks/useCartStore";
+import { useModalStore } from "../../hooks/useModalStore";
 
 const CartClearModal = () => {
-  const dispatch = useDispatch();
+  const { isOpen, modalType, closeModal } = useModalStore();
+  const { clearCart } = useCartActions();
 
-  const { isOpen, modalType } = useSelector((state) => state.modal);
-
-  if (!isOpen) return null;
-
-  if (modalType !== "clearCartConfirm") return null;
+  if (!isOpen || modalType !== "clearCartConfirm") return null;
 
   return (
     <div
@@ -17,7 +13,7 @@ const CartClearModal = () => {
     >
       <div
         className="absolute inset-0 bg-black/50"
-        onClick={() => dispatch(closeModal())}
+        onClick={closeModal}
       />
 
       <div className="relative z-10 bg-white rounded-lg p-6 w-80 shadow-xl">
@@ -28,7 +24,7 @@ const CartClearModal = () => {
         <div className="flex justify-between gap-4 mt-6">
           <button
             className="flex-1 py-2 rounded bg-gray-300"
-            onClick={() => dispatch(closeModal())}
+            onClick={closeModal}
           >
             아니요
           </button>
@@ -36,8 +32,8 @@ const CartClearModal = () => {
           <button
             className="flex-1 py-2 rounded bg-red-500 text-white"
             onClick={() => {
-              dispatch(clearCart());   
-              dispatch(closeModal()); 
+              clearCart();
+              closeModal();
             }}
           >
             네

@@ -1,0 +1,73 @@
+{
+  "hash": "76dfa747",
+  "configHash": "0e23e1af",
+  "lockfileHash": "67976e22",
+  "browserHash": "075a20b5",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "aa8f454d",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "6f94daed",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "9c340ebb",
+      "needsInterop": true
+    },
+    "react-redux": {
+      "src": "../../node_modules/react-redux/dist/react-redux.mjs",
+      "file": "react-redux.js",
+      "fileHash": "daa9efa3",
+      "needsInterop": false
+    },
+    "react-icons/fa": {
+      "src": "../../node_modules/react-icons/fa/index.mjs",
+      "file": "react-icons_fa.js",
+      "fileHash": "9602610d",
+      "needsInterop": false
+    },
+    "@reduxjs/toolkit": {
+      "src": "../../node_modules/@reduxjs/toolkit/dist/redux-toolkit.modern.mjs",
+      "file": "@reduxjs_toolkit.js",
+      "fileHash": "77ffd689",
+      "needsInterop": false
+    },
+    "zustand": {
+      "src": "../../node_modules/zustand/esm/index.mjs",
+      "file": "zustand.js",
+      "fileHash": "29f9ff38",
+      "needsInterop": false
+    },
+    "zustand/middleware/immer": {
+      "src": "../../node_modules/zustand/esm/middleware/immer.mjs",
+      "file": "zustand_middleware_immer.js",
+      "fileHash": "aa1a612a",
+      "needsInterop": false
+    },
+    "zustand/shallow": {
+      "src": "../../node_modules/zustand/esm/shallow.mjs",
+      "file": "zustand_shallow.js",
+      "fileHash": "e577e5cf",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-IGXLOIK6": {
+      "file": "chunk-IGXLOIK6.js"
+    },
+    "chunk-XX2DYYCB": {
+      "file": "chunk-XX2DYYCB.js"
+    },
+    "chunk-5WRI5ZAA": {
+      "file": "chunk-5WRI5ZAA.js"
+    }
+  }
+}
