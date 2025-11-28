@@ -114,10 +114,8 @@ const HomePage = () => {
           ?.map((lp) =>
             <LpCard key={lp.id} lp={lp} />
           )}
-        {!isFetching && <LpCardSkeletonList count={20} />}
+        {isFetching && !isPending && <LpCardSkeletonList count={10} />}
       </div>
-      {!isFetching && <div ref={ref} className="h-10" />}
-      {isFetching && <LpCardSkeletonList count={10} />}
     </div>
   );
 };
