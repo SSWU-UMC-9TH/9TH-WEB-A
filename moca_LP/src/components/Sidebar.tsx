@@ -10,14 +10,19 @@ type SidebarProps = {
 
 const Sidebar = ({ isOpen, onClose, onWithdrawClick }: SidebarProps) => {
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768 && isOpen) {
-        onClose();
-      }
-    };
+    const handleResize = () => window.innerWidth < 768 && isOpen && onClose();
+    const handleKeyDown = (e: KeyboardEvent) => e.key === "Escape" && isOpen && onClose();
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("keydown", handleKeyDown);
+
+    document.body.style.overflow = isOpen ? "hidden" : "";
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
   }, [isOpen, onClose]);
 
   return (

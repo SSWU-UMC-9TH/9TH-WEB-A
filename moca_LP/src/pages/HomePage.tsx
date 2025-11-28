@@ -4,10 +4,17 @@ import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { useInView } from "react-intersection-observer"
 import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
+import useDebounce from "../hooks/useDebounce";
+import { SEARCH_DELAY } from "../constants/delay";
+import useThrottle from "../hooks/useThrottle";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.asc);
+  const debouncedValue = useDebounce(search, SEARCH_DELAY);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const throttledScrollY = useThrottle(scrollY, 200);
 
   const {
     data: lps,
@@ -17,17 +24,38 @@ const HomePage = () => {
     fetchNextPage,
     isError,
     refetch
-  } = useGetInfiniteLpList(10, search, order);
+  } = useGetInfiniteLpList(10, debouncedValue, order, {
+    enabled: debouncedValue.trim().length > 0 || !isSearchFocused
+  });
 
-  const { ref, inView } = useInView({
+  const { ref } = useInView({
     threshold: 0,
   })
 
   useEffect(() => {
-    if (inView) {
-      !isFetching && hasNextPage && fetchNextPage();
+    if (
+      hasNextPage &&
+      throttledScrollY + window.innerHeight >= document.body.scrollHeight - 300
+    ) {
+      fetchNextPage();
     }
-  }, [inView, isFetching, hasNextPage, fetchNextPage]);
+  }, [throttledScrollY, hasNextPage, fetchNextPage]);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 무한 스크롤 방지
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  }, []);
 
   if (isError) {
     return (
@@ -49,6 +77,14 @@ const HomePage = () => {
     <div className="p-8 bg-[#F8F9FA] min-h-screen">
       {/* 정렬 버튼 */}
       <div className="flex justify-end mb-4 space-x-2">
+        <input
+          className="bg-[#6C757D] rounded-md p-2 placeholder-[#CED4DA] text-[#F8F9FA]"
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="검색어를 입력하세요"
+        />
         <button
           className={`px-4 py-2 rounded-md font-medium transition-all duration-200 border ${order === "asc"
             ? "bg-[#212529] text-[#E9ECEF] border-[#212529] shadow-sm"
@@ -77,10 +113,9 @@ const HomePage = () => {
           ?.flat()
           ?.map((lp) =>
             <LpCard key={lp.id} lp={lp} />
-        )}
-        {!isFetching && <LpCardSkeletonList count={20} />}
+          )}
+        {isFetching && !isPending && <LpCardSkeletonList count={10} />}
       </div>
-      <div ref={ref} className="h-2" />
     </div>
   );
 };
