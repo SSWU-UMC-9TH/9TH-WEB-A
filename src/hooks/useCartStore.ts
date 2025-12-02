@@ -44,11 +44,18 @@ export const useCartStore = create<CartState>()(
         set((state) => {
           const cartItem = state.cartItems.find((item) => item.id === id);
 
-          if (cartItem && cartItem.amount > 0) {
-            cartItem.amount -= 1;
+          if (cartItem) {
+            if (cartItem.amount > 1) {
+              cartItem.amount -= 1;
+            } else {
+              state.cartItems = state.cartItems.filter(
+                (item) => item.id !== id
+              );
+            }
           }
         });
       },
+
       removeItem: (id: string) => {
         set((state) => {
           state.cartItems = state.cartItems.filter((item) => item.id != id);
