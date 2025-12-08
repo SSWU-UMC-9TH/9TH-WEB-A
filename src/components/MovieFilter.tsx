@@ -38,7 +38,7 @@ export default function MovieFilter({ onChange }: MovieFilterProps) {
     >
       <div className="flex flex-wrap gap-6 items-end">
         <div className="min-w-[250px] flex-1">
-          <label className="mb-2 block text-sm font-bold text-hotPink">
+          <label className="mb-2 block text-sm font-bold text-pink-500">
             🎬 영화 제목
           </label>
           <Input
@@ -50,7 +50,7 @@ export default function MovieFilter({ onChange }: MovieFilterProps) {
         </div>
 
         <div className="min-w-[200px] flex-1">
-          <label className="mb-2 block text-sm font-bold text-hotPink">
+          <label className="mb-2 block text-sm font-bold text-pink-500">
             🔞 옵션
           </label>
           <SelectBox
@@ -63,7 +63,7 @@ export default function MovieFilter({ onChange }: MovieFilterProps) {
         </div>
 
         <div className="min-w-[200px] flex-1">
-          <label className="mb-2 block text-sm font-bold text-hotPink">
+          <label className="mb-2 block text-sm font-bold text-pink-500">
             🌐 언어
           </label>
           <LanguageSelector
